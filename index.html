@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>创意发散 - Creative Muse</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Dark mode toggle -->
+    <button id="theme-toggle" class="theme-toggle" title="切换主题">🌙</button>
+
+    <!-- Canvas area -->
+    <div id="canvas-container">
+      <svg id="edges-svg"></svg>
+      <div id="nodes-layer"></div>
+      <!-- Welcome state -->
+      <div id="welcome-hint" class="welcome-hint">
+        <span class="welcome-icon">✨</span>
+        <span>输入一个词，开始发散联想</span>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div id="input-area" class="input-area centered">
+      <input
+        id="word-input"
+        type="text"
+        placeholder="输入一个词..."
+        autocomplete="off"
+      />
+      <button id="submit-btn" class="submit-btn">发散</button>
+    </div>
+
+    <!-- Zoom controls -->
+    <div id="zoom-controls" class="zoom-controls">
+      <button id="zoom-in" title="放大">+</button>
+      <span id="zoom-level">100%</span>
+      <button id="zoom-out" title="缩小">−</button>
+      <button id="fit-view" title="适应视图">⊡</button>
+      <button id="clear-canvas" title="清空画布">✕</button>
+    </div>
+
+    <!-- Minimap -->
+    <canvas id="minimap-canvas" width="160" height="100"></canvas>
+
+    <!-- History toggle button -->
+    <button id="history-toggle" class="history-toggle" title="历史记录">☰</button>
+
+    <!-- Export button -->
+    <button id="export-image" class="export-btn" title="导出图片">⬇</button>
+
+    <!-- History drawer -->
+    <div id="history-drawer" class="history-drawer">
+      <div class="history-header">
+        <h3>历史记录</h3>
+        <button id="history-close" class="close-btn">✕</button>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </div>
+
+    <!-- History overlay (for closing drawer on outside click) -->
+    <div id="history-overlay" class="history-overlay hidden"></div>
+
+    <!-- Undo toast -->
+    <div id="undo-toast" class="undo-toast hidden">已撤销</div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
