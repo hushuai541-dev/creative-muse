@@ -904,7 +904,10 @@ html, body {
   width: 95vw;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 0 32px rgba(255, 214, 0, 0.15),
+    0 0 64px rgba(255, 214, 0, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.5);
   position: relative;
 }
 .pricing-title {
@@ -913,6 +916,7 @@ html, body {
   font-weight: 700;
   margin-bottom: 32px;
   letter-spacing: 0.03em;
+  color: var(--text-primary);
 }
 .pricing-close {
   position: absolute;
@@ -947,10 +951,22 @@ html, body {
   padding: 24px 20px;
   text-align: center;
   position: relative;
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow:
+    0 0 16px rgba(255, 214, 0, 0.06),
+    0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.pricing-card:hover {
+  box-shadow:
+    0 0 24px rgba(255, 214, 0, 0.12),
+    0 8px 30px rgba(0, 0, 0, 0.25);
 }
 .pricing-card.current-plan {
   border-color: var(--accent);
+  box-shadow:
+    0 0 24px rgba(255, 214, 0, 0.15),
+    0 0 48px rgba(255, 214, 0, 0.06),
+    0 4px 20px rgba(0, 0, 0, 0.2);
 }
 .pricing-badge {
   position: absolute;
@@ -964,12 +980,14 @@ html, body {
   padding: 4px 14px;
   border-radius: 12px;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(255, 214, 0, 0.3);
 }
 .pricing-plan-name {
   font-size: 16px;
   font-weight: 700;
   margin-top: 4px;
   margin-bottom: 12px;
+  color: var(--text-primary);
 }
 .pricing-price {
   font-size: 36px;
@@ -1016,7 +1034,7 @@ html, body {
   list-style: none;
   text-align: left;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   line-height: 2;
 }
 .pricing-features li {
@@ -1027,6 +1045,31 @@ html, body {
 .pricing-check {
   color: var(--accent);
   font-weight: 700;
+}
+
+/* Light mode pricing overrides */
+.light .pricing-card {
+  background: #ffffff;
+  border-color: #e0e0e0;
+  box-shadow:
+    0 0 16px rgba(255, 214, 0, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.06);
+}
+.light .pricing-features {
+  color: #333;
+}
+.light .pricing-plan-name {
+  color: #1a1a1a;
+}
+.light .pricing-price {
+  color: #1a1a1a;
+}
+.light .pricing-modal {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 32px rgba(255, 214, 0, 0.1),
+    0 0 64px rgba(255, 214, 0, 0.04),
+    0 24px 80px rgba(0, 0, 0, 0.12);
 }
 
 @media (max-width: 700px) {
