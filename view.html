@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>思维发散 - 只读视图</title>
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container">
+      <svg id="edges-svg"></svg>
+      <div id="nodes-layer"></div>
+      <div id="welcome-hint" class="welcome-hint hidden">
+        <span>加载中...</span>
+      </div>
+    </div>
+    <div id="zoom-controls" class="zoom-controls">
+      <button id="zoom-in" title="放大">+</button>
+      <span id="zoom-level">100%</span>
+      <button id="zoom-out" title="缩小">−</button>
+      <button id="fit-view" title="适应视图">⊡</button>
+    </div>
+    <div id="project-name" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:100;color:var(--text-muted);font-size:14px;font-weight:600;"></div>
+  </div>
+  <script type="module" src="/src/view.js"></script>
+</body>
+</html>

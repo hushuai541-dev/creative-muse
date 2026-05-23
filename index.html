@@ -10,6 +10,16 @@
     <!-- Dark mode toggle -->
     <button id="theme-toggle" class="theme-toggle" title="切换主题">🌙</button>
 
+    <!-- Project bar -->
+    <div id="project-bar">
+      <span id="project-name" class="project-name" title="点击编辑项目名">默认项目</span>
+      <button id="project-prev" title="上一个项目">◂</button>
+      <button id="project-list-btn" title="项目列表">☰</button>
+      <button id="project-next" title="下一个项目">▸</button>
+      <button id="project-new" title="新建项目">+</button>
+      <div id="project-dropdown" class="project-dropdown hidden"></div>
+    </div>
+
     <!-- Canvas area -->
     <div id="canvas-container">
       <svg id="edges-svg"></svg>
@@ -32,6 +42,11 @@
       <button id="submit-btn" class="submit-btn">发散</button>
     </div>
 
+    <!-- Template tags -->
+    <div id="template-tags" class="template-tags">
+      <span class="template-label">模板：</span>
+    </div>
+
     <!-- Zoom controls -->
     <div id="zoom-controls" class="zoom-controls">
       <button id="zoom-in" title="放大">+</button>
@@ -49,6 +64,8 @@
 
     <!-- Export button -->
     <button id="export-image" class="export-btn" title="导出图片">⬇</button>
+    <button id="export-markdown" class="export-btn" title="导出MD" style="top:116px">📋</button>
+    <button id="share-link" class="export-btn" title="分享链接" style="top:164px">🔗</button>
 
     <!-- History drawer -->
     <div id="history-drawer" class="history-drawer">

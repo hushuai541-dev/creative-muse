@@ -54,7 +54,11 @@ export function init(options) {
   zoomLevelEl = options.zoomLevelEl;
   onGraphChange = options.onGraphChange || null;
 
-  loadState();
+  if (options.initialState) {
+    loadStateFromData(options.initialState);
+  } else {
+    loadState();
+  }
   bindEvents();
   startPhysicsLoop();
   updateWelcomeHint();
@@ -85,28 +89,46 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const data = JSON.parse(raw);
-      state.nodes = data.nodes || {};
-      state.edges = data.edges || [];
-      state.rootId = data.rootId || null;
-      state.nodeIdCounter = data.nodeIdCounter || 0;
-      // Migrate old data
-      for (const id in state.nodes) {
-        const n = state.nodes[id];
-        if (n.mode === undefined) n.mode = 'associate';
-        if (n.painType === undefined) n.painType = null;
-        if (n.depth === undefined) {
-          let d = 0, cur = n;
-          while (cur.parentId && state.nodes[cur.parentId]) { d++; cur = state.nodes[cur.parentId]; }
-          n.depth = d;
-        }
-        n.vx = 0;
-        n.vy = 0;
-      }
-      for (const e of state.edges) {
-        if (e.type === undefined) e.type = 'solid';
-      }
+      applyStateData(data);
     }
   } catch { /* ignore */ }
+}
+
+export function loadStateFromData(data) {
+  if (!data) return;
+  applyStateData(data);
+}
+
+function applyStateData(data) {
+  state.nodes = data.nodes || {};
+  state.edges = data.edges || [];
+  state.rootId = data.rootId || null;
+  state.nodeIdCounter = data.nodeIdCounter || 0;
+  // Migrate old data
+  for (const id in state.nodes) {
+    const n = state.nodes[id];
+    if (n.mode === undefined) n.mode = 'associate';
+    if (n.painType === undefined) n.painType = null;
+    if (n.depth === undefined) {
+      let d = 0, cur = n;
+      while (cur.parentId && state.nodes[cur.parentId]) { d++; cur = state.nodes[cur.parentId]; }
+      n.depth = d;
+    }
+    n.vx = 0;
+    n.vy = 0;
+  }
+  for (const e of state.edges) {
+    if (e.type === undefined) e.type = 'solid';
+  }
+}
+
+export function exportState() {
+  return JSON.parse(JSON.stringify({
+    nodes: state.nodes,
+    edges: state.edges,
+    rootId: state.rootId,
+    nodeIdCounter: state.nodeIdCounter,
+  }));
 }
 
 // --- Node helpers ---
@@ -1071,6 +1093,46 @@ export function hasNodes() {
 export function getRootWord() {
   const root = getNode(state.rootId);
   return root ? root.zh : '';
+}
+
+// --- Export to Markdown ---
+
+export function exportToMarkdown(projectName) {
+  const tagLabels = { pain: '🚨 痛', pleasure: '😊 爽', scenario: '📍 场', solution: '✅ 解' };
+
+  function walk(nid, indent) {
+    const node = getNode(nid);
+    if (!node) return '';
+    let md = '';
+    const prefix = '  '.repeat(indent);
+    let label = '';
+    if (node.painType && tagLabels[node.painType]) {
+      label = tagLabels[node.painType] + ' ';
+    }
+    const text = label + node.zh;
+    md += `${prefix}- ${text}\n`;
+    if (node.expanded && node.children.length > 0) {
+      for (const cid of node.children) {
+        md += walk(cid, indent + 1);
+      }
+    }
+    return md;
+  }
+
+  let markdown = `# ${projectName || '思维发散'}\n\n`;
+  if (state.rootId) {
+    markdown += walk(state.rootId, 0);
+  } else {
+    markdown += '(空画布)\n';
+  }
+
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${projectName || 'creative-muse'}-${Date.now()}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // --- Export to Image ---

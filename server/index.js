@@ -2,10 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
+const sharesPath = path.join(__dirname, '..', 'shares');
+
+// Ensure shares directory exists
+if (!fs.existsSync(sharesPath)) {
+  fs.mkdirSync(sharesPath, { recursive: true });
+}
 
 const app = express();
 app.use(cors());
@@ -273,6 +281,43 @@ app.post('/api/solution', async (req, res) => {
     console.error('Solution error:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+// Share endpoints
+app.post('/api/share', (req, res) => {
+  const { graphState, projectName } = req.body;
+  if (!graphState) {
+    return res.status(400).json({ error: 'graphState is required' });
+  }
+  try {
+    const shareId = crypto.randomBytes(8).toString('hex');
+    const data = {
+      graphState,
+      projectName: projectName || '未命名项目',
+      createdAt: new Date().toISOString(),
+    };
+    fs.writeFileSync(path.join(sharesPath, `${shareId}.json`), JSON.stringify(data));
+    res.json({ shareId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/share/:id', (req, res) => {
+  try {
+    const filePath = path.join(sharesPath, `${req.params.id}.json`);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'Share not found' });
+    }
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/view/:id', (req, res) => {
+  res.sendFile(path.join(distPath, 'view.html'));
 });
 
 // SPA fallback — serve index.html for non-API routes
