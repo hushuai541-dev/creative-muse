@@ -175,7 +175,6 @@ function onGraphChange() {
   if (list.length > 0 && list[0].word === currentWord) {
     History.updateLatestHistory(Graph.getGraphState());
   }
-  scheduleSave();
 }
 
 // --- History Restore ---
