@@ -10,16 +10,91 @@ import * as History from './history.js';
 const THEME_KEY = 'creative-muse-theme';
 let isLight = false;
 
+// Usage tracking
+const USAGE_KEY = 'creative-muse-usage';
+const FREE_DAILY_LIMIT = 5;
+let usageCount = 0;
+let usageDate = '';
+
+// Plan state (free / basic / pro)
+const PLAN_KEY = 'creative-muse-plan';
+let currentPlan = 'free';
+let basicRemaining = 0; // remaining uses for basic plan
+
 let currentWord = '';
+
+function loadUsage() {
+  try {
+    const raw = localStorage.getItem(USAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      const today = new Date().toDateString();
+      if (data.date === today) {
+        usageCount = data.count || 0;
+      } else {
+        usageCount = 0;
+      }
+      usageDate = today;
+    } else {
+      usageDate = new Date().toDateString();
+      usageCount = 0;
+    }
+    currentPlan = localStorage.getItem(PLAN_KEY) || 'free';
+    if (currentPlan === 'basic') {
+      basicRemaining = parseInt(localStorage.getItem('creative-muse-basic-remaining') || '0');
+    }
+  } catch {
+    usageCount = 0;
+    usageDate = new Date().toDateString();
+    currentPlan = 'free';
+  }
+}
+
+function saveUsage() {
+  try {
+    localStorage.setItem(USAGE_KEY, JSON.stringify({ date: usageDate, count: usageCount }));
+    localStorage.setItem(PLAN_KEY, currentPlan);
+    if (currentPlan === 'basic') {
+      localStorage.setItem('creative-muse-basic-remaining', String(basicRemaining));
+    }
+  } catch { /* ignore */ }
+}
+
+function canUse() {
+  if (currentPlan === 'pro') return true;
+  if (currentPlan === 'basic') return basicRemaining > 0;
+  return usageCount < FREE_DAILY_LIMIT;
+}
+
+function incrementUsage() {
+  if (currentPlan === 'pro') return;
+  if (currentPlan === 'basic') {
+    basicRemaining--;
+  } else {
+    usageCount++;
+  }
+  saveUsage();
+}
+
+function showPricingModal() {
+  document.getElementById('pricing-overlay').classList.remove('hidden');
+}
+
+function hidePricingModal() {
+  document.getElementById('pricing-overlay').classList.add('hidden');
+}
 
 // --- Init ---
 
 function init() {
+  loadUsage();
   initTheme();
   initGraph();
   initInput();
   initHistory();
   initButtons();
+  initPricing();
+  updateUsageDisplay();
 }
 
 function initGraph() {
@@ -129,6 +204,10 @@ function updateThemeIcon() {
 // --- Word Submit ---
 
 async function onWordSubmit(word) {
+  if (!canUse()) {
+    showPricingModal();
+    return;
+  }
   const submitBtn = document.getElementById('submit-btn');
   submitBtn.disabled = true;
   submitBtn.textContent = '...';
@@ -137,6 +216,8 @@ async function onWordSubmit(word) {
     currentWord = word;
     Graph.setRootWord(word);
     Graph.addChildNodes(Graph.getGraphState().rootId, words);
+    incrementUsage();
+    updateUsageDisplay();
     Input.clear();
     History.addEntry(word, Graph.getGraphState());
   } catch (err) {
@@ -150,6 +231,10 @@ async function onWordSubmit(word) {
 // --- Popup Menu Action ---
 
 async function onPopupAction(nodeId, word, mode) {
+  if (!canUse()) {
+    showPricingModal();
+    return;
+  }
   const label = mode === 'pain' ? '痛点分析' : mode === 'scenario' ? '场景发散' : mode === 'solution' ? '解决方案' : '联想';
   try {
     let words;
@@ -163,12 +248,68 @@ async function onPopupAction(nodeId, word, mode) {
       words = await expandWord(word);
     }
     Graph.addChildNodes(nodeId, words, mode);
+    incrementUsage();
+    updateUsageDisplay();
   } catch (err) {
     alert(label + '失败：' + err.message);
   }
 }
 
 // --- Graph Change ---
+
+function initPricing() {
+  document.getElementById('pricing-close').addEventListener('click', hidePricingModal);
+  document.getElementById('pricing-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) hidePricingModal();
+  });
+  document.querySelectorAll('.pricing-btn.primary').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const plan = btn.dataset.plan;
+      if (plan === 'basic') {
+        currentPlan = 'basic';
+        basicRemaining = 10;
+        saveUsage();
+        updateUsageDisplay();
+        hidePricingModal();
+        alert('已升级至基础版！畅享 10 次发散。');
+      } else if (plan === 'pro') {
+        currentPlan = 'pro';
+        saveUsage();
+        updateUsageDisplay();
+        hidePricingModal();
+        alert('已升级至 Pro 版！无限发散，畅快使用。');
+      }
+    });
+  });
+}
+
+function updateUsageDisplay() {
+  let el = document.getElementById('usage-display');
+  if (!el) {
+    el = document.createElement('span');
+    el.id = 'usage-display';
+    el.style.cssText = 'position:fixed;top:20px;right:80px;z-index:100;font-size:12px;color:var(--text-muted);cursor:pointer;padding:6px 12px;border-radius:14px;border:1px solid var(--surface-border);background:var(--surface-bg);transition:all 0.15s;';
+    el.addEventListener('click', showPricingModal);
+    document.body.appendChild(el);
+  }
+  if (currentPlan === 'pro') {
+    el.textContent = 'Pro';
+    el.style.color = '#1a1a1a';
+    el.style.background = 'var(--accent)';
+    el.style.borderColor = 'var(--accent)';
+  } else if (currentPlan === 'basic') {
+    el.textContent = `基础版 · 剩余 ${basicRemaining} 次`;
+    el.style.color = 'var(--text-secondary)';
+    el.style.background = 'var(--surface-bg)';
+    el.style.borderColor = 'var(--surface-border)';
+  } else {
+    const remaining = FREE_DAILY_LIMIT - usageCount;
+    el.textContent = `免费 · 剩余 ${Math.max(0, remaining)} 次`;
+    el.style.color = 'var(--text-muted)';
+    el.style.background = 'var(--surface-bg)';
+    el.style.borderColor = 'var(--surface-border)';
+  }
+}
 
 function onGraphChange() {
   const list = History.getHistory();

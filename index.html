@@ -66,6 +66,48 @@
 
     <!-- Undo toast -->
     <div id="undo-toast" class="undo-toast hidden">已撤销</div>
+
+    <!-- Pricing overlay -->
+    <div id="pricing-overlay" class="pricing-overlay hidden">
+      <div class="pricing-modal">
+        <button id="pricing-close" class="pricing-close">✕</button>
+        <h2 class="pricing-title">升级套餐</h2>
+        <div class="pricing-cards">
+          <!-- Free -->
+          <div class="pricing-card current-plan" id="plan-free">
+            <div class="pricing-plan-name">免费版</div>
+            <div class="pricing-price"><span class="pricing-currency">¥</span>0<span class="pricing-period">/月</span></div>
+            <button class="pricing-btn secondary" disabled>你当前的套餐</button>
+            <ul class="pricing-features">
+              <li><span class="pricing-check">✓</span> 核心模型</li>
+              <li><span class="pricing-check">✓</span> 每天免费 5 次消息发散</li>
+            </ul>
+          </div>
+          <!-- Basic -->
+          <div class="pricing-card" id="plan-basic">
+            <div class="pricing-plan-name">基础版</div>
+            <div class="pricing-price"><span class="pricing-currency">¥</span>3.9<span class="pricing-period">/10次</span></div>
+            <button class="pricing-btn primary" data-plan="basic">升级至基础版</button>
+            <ul class="pricing-features">
+              <li><span class="pricing-check">✓</span> 核心模型</li>
+              <li><span class="pricing-check">✓</span> 畅聊 10 次，更多体验</li>
+            </ul>
+          </div>
+          <!-- Pro -->
+          <div class="pricing-card" id="plan-pro">
+            <div class="pricing-badge">🔥 热门</div>
+            <div class="pricing-plan-name">Pro 版</div>
+            <div class="pricing-price"><span class="pricing-currency">¥</span>19.9<span class="pricing-period">/月</span></div>
+            <button class="pricing-btn primary" data-plan="pro">升级至 Pro</button>
+            <ul class="pricing-features">
+              <li><span class="pricing-check">✓</span> 顶级模型</li>
+              <li><span class="pricing-check">✓</span> 每天无限次消息发散</li>
+              <li><span class="pricing-check">✓</span> 抢先体验实验性功能</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
