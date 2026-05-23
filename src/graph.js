@@ -657,6 +657,8 @@ function endNodeDrag() {
   if (!dragging) return;
   const node = getNode(dragging.nodeId);
   if (node) {
+    node.vx = 0;
+    node.vy = 0;
     const dx = node.x - dragging.startX;
     const dy = node.y - dragging.startY;
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
