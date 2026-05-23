@@ -5,148 +5,24 @@ import { expandWord, expandPainPoints, expandScenario, expandSolution } from './
 import * as Graph from './graph.js';
 import * as Input from './input.js';
 import * as History from './history.js';
-import * as Projects from './projects.js';
-import { templates } from './templates.js';
 
 // Theme
 const THEME_KEY = 'creative-muse-theme';
 let isLight = false;
 
-// Current project
-let currentProject = null;
 let currentWord = '';
-let projectSaveTimeout = null;
 
 // --- Init ---
 
 function init() {
   initTheme();
-  initProjects();
   initGraph();
   initInput();
   initHistory();
   initButtons();
-  initTemplates();
-}
-
-function initProjects() {
-  currentProject = Projects.getCurrentProject();
-  updateProjectUI();
-  document.getElementById('project-name').addEventListener('click', () => {
-    const name = prompt('项目名称：', currentProject.name);
-    if (name && name.trim()) {
-      currentProject.name = name.trim();
-      Projects.renameProject(currentProject.id, currentProject.name);
-      updateProjectUI();
-    }
-  });
-  document.getElementById('project-new').addEventListener('click', () => {
-    saveCurrentProject();
-    currentProject = Projects.createProject();
-    currentWord = '';
-    Graph.clearCanvas();
-    Input.clear();
-    updateProjectUI();
-  });
-  document.getElementById('project-prev').addEventListener('click', () => navigateProject(-1));
-  document.getElementById('project-next').addEventListener('click', () => navigateProject(1));
-  document.getElementById('project-list-btn').addEventListener('click', toggleProjectDropdown);
-
-  document.addEventListener('click', (e) => {
-    const dd = document.getElementById('project-dropdown');
-    if (!e.target.closest('#project-list-btn') && !e.target.closest('.project-dropdown')) {
-      dd.classList.add('hidden');
-    }
-  });
-}
-
-function navigateProject(dir) {
-  const list = Projects.getProjects();
-  const idx = list.findIndex(p => p.id === currentProject.id);
-  const next = list[(idx + dir + list.length) % list.length];
-  if (next && next.id !== currentProject.id) {
-    saveCurrentProject();
-    currentProject = next;
-    loadProjectIntoGraph();
-    updateProjectUI();
-  }
-}
-
-function toggleProjectDropdown() {
-  const dd = document.getElementById('project-dropdown');
-  if (dd.classList.contains('hidden')) {
-    const list = Projects.getProjects();
-    dd.innerHTML = list.map(p => `
-      <div class="project-dropdown-item${p.id === currentProject.id ? ' active' : ''}" data-id="${p.id}">
-        <span>${escapeHtml(p.name)}</span>
-        <button class="project-delete-btn" data-id="${p.id}" title="删除">✕</button>
-      </div>
-    `).join('');
-    dd.querySelectorAll('.project-dropdown-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        if (e.target.closest('.project-delete-btn')) {
-          e.stopPropagation();
-          const id = e.target.closest('.project-delete-btn').dataset.id;
-          if (confirm('确定删除此项目？')) {
-            Projects.deleteProject(id);
-            if (id === currentProject.id) {
-              currentProject = Projects.getCurrentProject();
-              loadProjectIntoGraph();
-            }
-            updateProjectUI();
-          }
-          dd.classList.add('hidden');
-          return;
-        }
-        const id = item.dataset.id;
-        if (id !== currentProject.id) {
-          saveCurrentProject();
-          currentProject = Projects.getProject(id);
-          loadProjectIntoGraph();
-          updateProjectUI();
-        }
-        dd.classList.add('hidden');
-      });
-    });
-    dd.classList.remove('hidden');
-  } else {
-    dd.classList.add('hidden');
-  }
-}
-
-function updateProjectUI() {
-  document.getElementById('project-name').textContent = currentProject.name;
-}
-
-function saveCurrentProject() {
-  if (currentProject) {
-    Projects.saveGraphState(currentProject.id, Graph.exportState());
-  }
-}
-
-function loadProjectIntoGraph() {
-  const state = currentProject.graphState;
-  if (state && state.rootId) {
-    Graph.loadStateFromData(state);
-    currentWord = Graph.getRootWord();
-  } else {
-    Graph.clearCanvas();
-    currentWord = '';
-  }
-  Input.clear();
-}
-
-// Debounced auto-save on graph change
-function scheduleSave() {
-  if (projectSaveTimeout) return;
-  projectSaveTimeout = setTimeout(() => {
-    projectSaveTimeout = null;
-    saveCurrentProject();
-  }, 500);
 }
 
 function initGraph() {
-  const state = currentProject.graphState;
   Graph.init({
     canvasContainer: document.getElementById('canvas-container'),
     edgesSvg: document.getElementById('edges-svg'),
@@ -154,7 +30,6 @@ function initGraph() {
     welcomeHint: document.getElementById('welcome-hint'),
     zoomLevelEl: document.getElementById('zoom-level'),
     onGraphChange: onGraphChange,
-    initialState: state && state.rootId ? state : null,
   });
   if (Graph.hasNodes()) {
     currentWord = Graph.getRootWord();
@@ -196,61 +71,10 @@ function initButtons() {
     Graph.clearCanvas();
     currentWord = '';
     Input.clear();
-    saveCurrentProject();
   });
   document.getElementById('export-image').addEventListener('click', () => Graph.exportToImage());
-  document.getElementById('export-markdown').addEventListener('click', () => Graph.exportToMarkdown(currentProject.name));
+  document.getElementById('export-markdown').addEventListener('click', () => Graph.exportToMarkdown('思维发散'));
   document.getElementById('share-link').addEventListener('click', shareCurrentGraph);
-}
-
-function initTemplates() {
-  const container = document.getElementById('template-tags');
-  templates.forEach(t => {
-    const tag = document.createElement('span');
-    tag.className = 'template-tag';
-    tag.textContent = t.icon + ' ' + t.name;
-    tag.title = t.prompt;
-    tag.addEventListener('click', () => {
-      const word = prompt(t.prompt, '');
-      if (word && word.trim()) {
-        if (t.mode === 'pain') {
-          doTemplateSearch(word.trim(), 'pain');
-        } else if (t.mode === 'scenario') {
-          doTemplateSearch(word.trim(), 'scenario');
-        } else {
-          document.getElementById('word-input').value = word.trim();
-          document.getElementById('submit-btn').click();
-        }
-      }
-    });
-    container.appendChild(tag);
-  });
-}
-
-async function doTemplateSearch(word, mode) {
-  const submitBtn = document.getElementById('submit-btn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = '...';
-  try {
-    let words;
-    if (mode === 'pain') {
-      words = await expandPainPoints(word);
-    } else if (mode === 'scenario') {
-      words = await expandScenario(word);
-    } else {
-      words = await expandWord(word);
-    }
-    currentWord = word;
-    Graph.setRootWord(word);
-    Graph.addChildNodes(Graph.getGraphState().rootId, words, mode);
-    Input.clear();
-    History.addEntry(word, Graph.getGraphState());
-  } catch (err) {
-    alert('发散失败：' + err.message);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = '发散';
-  }
 }
 
 async function shareCurrentGraph() {
@@ -263,7 +87,7 @@ async function shareCurrentGraph() {
     const res = await fetch('/api/share', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ graphState: state, projectName: currentProject.name }),
+      body: JSON.stringify({ graphState: state, projectName: '思维发散' }),
     });
     if (!res.ok) throw new Error('Share failed');
     const { shareId } = await res.json();
