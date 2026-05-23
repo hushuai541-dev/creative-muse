@@ -288,26 +288,21 @@ function updateUsageDisplay() {
   if (!el) {
     el = document.createElement('span');
     el.id = 'usage-display';
-    el.style.cssText = 'position:fixed;top:20px;right:80px;z-index:100;font-size:12px;color:var(--text-muted);cursor:pointer;padding:6px 12px;border-radius:14px;border:1px solid var(--surface-border);background:var(--surface-bg);transition:all 0.15s;';
+    el.className = 'usage-badge';
     el.addEventListener('click', showPricingModal);
     document.body.appendChild(el);
   }
+  el.classList.remove('pro', 'basic', 'free');
   if (currentPlan === 'pro') {
-    el.textContent = 'Pro';
-    el.style.color = '#1a1a1a';
-    el.style.background = 'var(--accent)';
-    el.style.borderColor = 'var(--accent)';
+    el.textContent = 'Pro · 无限次数';
+    el.classList.add('pro');
   } else if (currentPlan === 'basic') {
     el.textContent = `基础版 · 剩余 ${basicRemaining} 次`;
-    el.style.color = 'var(--text-secondary)';
-    el.style.background = 'var(--surface-bg)';
-    el.style.borderColor = 'var(--surface-border)';
+    el.classList.add('basic');
   } else {
     const remaining = FREE_DAILY_LIMIT - usageCount;
     el.textContent = `免费 · 剩余 ${Math.max(0, remaining)} 次`;
-    el.style.color = 'var(--text-muted)';
-    el.style.background = 'var(--surface-bg)';
-    el.style.borderColor = 'var(--surface-border)';
+    el.classList.add('free');
   }
 }
 
