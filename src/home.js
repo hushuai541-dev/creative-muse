@@ -32,6 +32,23 @@ function initProfileModal() {
     document.getElementById('profile-overlay').classList.add('hidden');
     showPricingModal();
   });
+  document.getElementById('profile-invite-btn').addEventListener('click', async () => {
+    const code = document.getElementById('profile-invite-input').value.trim();
+    if (!code) return;
+    const name = Auth.getUser()?.name || '用户';
+    try {
+      const result = await Auth.redeemInvite(code, name);
+      if (result.success) {
+        alert(`兑换成功！+${result.reward} 次永久发散次数`);
+        updateUsageDisplay();
+        document.getElementById('profile-invite-input').value = '';
+      } else {
+        alert(result.error || '兑换失败');
+      }
+    } catch (err) {
+      alert('兑换失败：' + err.message);
+    }
+  });
 }
 
 function initLoginUI() {

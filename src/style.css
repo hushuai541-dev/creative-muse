@@ -1037,13 +1037,13 @@ html, body {
 .profile-label {
   display: block;
   font-size: 11px;
-  color: var(--text-muted);
+  color: #fff;
   margin-bottom: 4px;
 }
 .profile-value {
   font-size: 15px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #fff;
 }
 .profile-value.code {
   font-family: monospace;
@@ -1054,6 +1054,29 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.profile-invite-redeem {
+  display: flex;
+  gap: 6px;
+}
+.profile-invite-redeem input {
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-bg);
+  color: #fff;
+  font-size: 13px;
+  font-family: var(--font);
+  outline: none;
+}
+.profile-invite-redeem input:focus {
+  border-color: var(--accent);
+}
+.profile-invite-redeem button {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* --- Login Modal --- */
