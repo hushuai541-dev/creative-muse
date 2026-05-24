@@ -3,11 +3,8 @@
 import './style.css';
 import * as Auth from './auth.js';
 
-const hotKeywords = ['竞品分析', '用户画像', '需求拆解', '头脑风暴', '痛点挖掘', '场景梳理', 'SWOT分析', '用户体验'];
-
 function init() {
   initLoginUI();
-  initHotTags();
   initInput();
   initPricing();
   updateUsageDisplay();
@@ -81,20 +78,6 @@ async function showProfile() {
   } else {
     alert(msg);
   }
-}
-
-function initHotTags() {
-  const container = document.querySelector('.home-hot-tags');
-  hotKeywords.forEach(kw => {
-    const tag = document.createElement('span');
-    tag.className = 'template-tag';
-    tag.textContent = kw;
-    tag.addEventListener('click', () => {
-      document.getElementById('home-word-input').value = kw;
-      document.getElementById('home-submit-btn').click();
-    });
-    container.appendChild(tag);
-  });
 }
 
 function initInput() {
