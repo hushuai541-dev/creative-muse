@@ -3,3 +3,4 @@ dist/
 .env
 *.png
 shares/
+server/users.json
