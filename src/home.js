@@ -154,8 +154,8 @@ function initPricing() {
       }
       try {
         await Auth.upgradePlan(plan);
+        await updateUsageDisplay();
         hidePricingModal();
-        updateUsageDisplay();
         alert(plan === 'pro' ? '已升级至 Pro 版！' : '已升级至基础版！');
       } catch (err) {
         alert('升级失败：' + err.message);

@@ -281,7 +281,7 @@ function initPricing() {
         if (Auth.isLoggedIn()) {
           await Auth.upgradePlan(plan);
         }
-        remainingUsage.plan = plan;
+        await updateRemaining();
         hidePricingModal();
         updateUsageDisplay();
         alert(plan === 'pro' ? '已升级至 Pro 版！' : '已升级至基础版！');
