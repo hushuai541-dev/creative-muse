@@ -139,7 +139,20 @@ function initPricing() {
   });
 }
 
-function showPricingModal() {
+async function showPricingModal() {
+  let plan = 'free';
+  try {
+    const r = await Auth.getRemaining();
+    plan = r.plan || 'free';
+  } catch {}
+  document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('current-plan'));
+  if (plan === 'free') {
+    document.getElementById('plan-free')?.classList.add('current-plan');
+  } else if (plan === 'basic') {
+    document.getElementById('plan-basic')?.classList.add('current-plan');
+  } else {
+    document.getElementById('plan-pro')?.classList.add('current-plan');
+  }
   document.getElementById('pricing-overlay').classList.remove('hidden');
 }
 

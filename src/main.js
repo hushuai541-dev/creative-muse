@@ -35,15 +35,47 @@ async function canUse() {
 }
 
 async function incrementUsage() {
-  if (!Auth.isLoggedIn()) {
+  try {
+    if (!Auth.isLoggedIn()) {
+      remainingUsage.remaining--;
+      return;
+    }
+    await Auth.spendOneUse();
+    await updateRemaining();
+  } catch {
     remainingUsage.remaining--;
-    return;
   }
-  await Auth.spendOneUse();
-  await updateRemaining();
 }
 
 function showPricingModal() {
+  const plan = remainingUsage.plan || 'free';
+  document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('current-plan'));
+  document.querySelectorAll('.pricing-btn.primary').forEach(b => {
+    b.style.display = '';
+    b.disabled = false;
+  });
+  document.querySelectorAll('.pricing-btn.secondary').forEach(b => {
+    b.style.display = '';
+  });
+  if (plan === 'free') {
+    document.getElementById('plan-free')?.classList.add('current-plan');
+    const fb = document.querySelector('#plan-free .pricing-btn.secondary');
+    if (fb) { fb.textContent = '你当前的套餐'; fb.style.display = ''; }
+    document.querySelector('#plan-basic .pricing-btn')?.classList.add('primary');
+    document.querySelector('#plan-pro .pricing-btn')?.classList.add('primary');
+  } else if (plan === 'basic') {
+    document.getElementById('plan-basic')?.classList.add('current-plan');
+    const bb = document.querySelector('#plan-basic .pricing-btn');
+    if (bb) { bb.textContent = '你当前的套餐'; bb.className = 'pricing-btn secondary'; bb.disabled = true; }
+    document.querySelector('#plan-free .pricing-btn')?.classList.add('primary');
+    document.querySelector('#plan-pro .pricing-btn')?.classList.add('primary');
+  } else {
+    document.getElementById('plan-pro')?.classList.add('current-plan');
+    const pb = document.querySelector('#plan-pro .pricing-btn');
+    if (pb) { pb.textContent = '你当前的套餐'; pb.className = 'pricing-btn secondary'; pb.disabled = true; }
+    document.querySelector('#plan-free .pricing-btn')?.classList.add('primary');
+    document.querySelector('#plan-basic .pricing-btn')?.classList.add('primary');
+  }
   document.getElementById('pricing-overlay').classList.remove('hidden');
 }
 
