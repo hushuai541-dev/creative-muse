@@ -40,6 +40,11 @@ async function init() {
     state.rootId = data.graphState.rootId || null;
     if (data.projectName) {
       document.getElementById('project-name').textContent = data.projectName;
+      document.title = data.projectName + ' - Creative Muse';
+      updateMeta('og:title', data.projectName + ' - Creative Muse');
+      updateMeta('twitter:title', data.projectName + ' - Creative Muse');
+      updateMeta('og:description', '查看' + data.projectName + '的思维发散分析结果');
+      updateMeta('twitter:description', '查看' + data.projectName + '的思维发散分析结果');
     }
     fitView();
   } catch (err) {
@@ -255,6 +260,16 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function updateMeta(name, content) {
+  let meta = document.querySelector(`meta[property="${name}"], meta[name="${name}"]`);
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(name.includes('og:') ? 'property' : 'name', name);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
 }
 
 document.addEventListener('DOMContentLoaded', init);
