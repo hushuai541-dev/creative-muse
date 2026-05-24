@@ -216,7 +216,7 @@ function updateThemeIcon() {
 // --- Word Submit ---
 
 async function onWordSubmit(word) {
-  if (!canUse()) {
+  if (!(await canUse())) {
     showPricingModal();
     return;
   }
@@ -228,7 +228,7 @@ async function onWordSubmit(word) {
     currentWord = word;
     Graph.setRootWord(word);
     Graph.addChildNodes(Graph.getGraphState().rootId, words);
-    incrementUsage();
+    await incrementUsage();
     updateUsageDisplay();
     Input.clear();
     History.addEntry(word, Graph.getGraphState());
@@ -243,7 +243,7 @@ async function onWordSubmit(word) {
 // --- Popup Menu Action ---
 
 async function onPopupAction(nodeId, word, mode) {
-  if (!canUse()) {
+  if (!(await canUse())) {
     showPricingModal();
     return;
   }
@@ -260,7 +260,7 @@ async function onPopupAction(nodeId, word, mode) {
       words = await expandWord(word);
     }
     Graph.addChildNodes(nodeId, words, mode);
-    incrementUsage();
+    await incrementUsage();
     updateUsageDisplay();
   } catch (err) {
     alert(label + '失败：' + err.message);
@@ -301,17 +301,14 @@ function updateUsageDisplay() {
     el.addEventListener('click', showPricingModal);
     document.body.appendChild(el);
   }
+  const plan = remainingUsage.plan || 'free';
   el.classList.remove('pro', 'basic', 'free');
-  if (currentPlan === 'pro') {
+  if (plan === 'pro') {
     el.textContent = 'Pro · 无限次数';
     el.classList.add('pro');
-  } else if (currentPlan === 'basic') {
-    el.textContent = `基础版 · 剩余 ${basicRemaining} 次`;
-    el.classList.add('basic');
   } else {
-    const remaining = FREE_DAILY_LIMIT - usageCount;
-    el.textContent = `免费 · 剩余 ${Math.max(0, remaining)} 次`;
-    el.classList.add('free');
+    el.textContent = `剩余 ${remainingUsage.remaining} 次`;
+    el.classList.add(remainingUsage.remaining > 5 ? 'basic' : 'free');
   }
 }
 
