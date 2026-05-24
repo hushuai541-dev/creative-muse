@@ -161,6 +161,17 @@ export function renderEdges() {
     const type = edge.type || 'solid';
     const className = type === 'dashed' ? 'graph-edge dashed' : 'graph-edge';
     svgContent += `<path d="M${fx},${fy} Q${cpx},${cpy} ${tx_},${ty_}" class="${className}" style="opacity:${opacity}" />`;
+
+    // Particle dots along edge (3 dots per edge, staggered animation)
+    if (type === 'solid' && opacity > 0.3) {
+      for (let i = 1; i <= 3; i++) {
+        const t = i / 4;
+        const dt = 1 - t;
+        const px = dt * dt * fx + 2 * dt * t * cpx + t * t * tx_;
+        const py = dt * dt * fy + 2 * dt * t * cpy + t * t * ty_;
+        svgContent += `<circle cx="${px}" cy="${py}" r="2" class="edge-particle" style="animation-delay:${(i-1)*0.3}s;opacity:${opacity}" />`;
+      }
+    }
   }
   S.edgesSvg.innerHTML = svgContent;
 }

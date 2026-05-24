@@ -329,10 +329,13 @@ export function addChildNodes(parentId, words, mode = 'associate') {
   if (!parent) return;
   const edgeType = (mode === 'pain' || mode === 'scenario' || mode === 'solution') ? 'dashed' : 'solid';
   const newChildIds = [];
+  let idx = 0;
   for (const w of words) {
     const painType = mode === 'scenario' ? 'scenario' : mode === 'solution' ? 'solution' : (w.type || null);
     const child = S.createNode(w.zh, w.en, parent.x, parent.y, parentId, mode, painType);
     child.animScale = 0; child.animOpacity = 0; child.targetScale = 1; child.targetOpacity = 1;
+    child.waveDelay = idx * 80; // 80ms stagger
+    idx++;
     S.state.nodes[child.id] = child;
     parent.children.push(child.id);
     S.state.edges.push({ from: parentId, to: child.id, type: edgeType });

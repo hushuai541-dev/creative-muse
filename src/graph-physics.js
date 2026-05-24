@@ -5,20 +5,35 @@ import * as S from './graph-state.js';
 import * as R from './graph-render.js';
 
 export function startPhysicsLoop() {
-  function tick() {
+  const startTime = performance.now();
+
+  function tick(now) {
     let needsUpdate = false;
 
     for (const id in S.state.nodes) {
       const node = S.state.nodes[id];
-      if (node.animScale !== node.targetScale) {
-        node.animScale += (node.targetScale - node.animScale) * 0.15;
-        if (Math.abs(node.targetScale - node.animScale) < 0.002) node.animScale = node.targetScale;
-        needsUpdate = true;
-      }
-      if (node.animOpacity !== node.targetOpacity) {
-        node.animOpacity += (node.targetOpacity - node.animOpacity) * 0.15;
-        if (Math.abs(node.targetOpacity - node.animOpacity) < 0.002) node.animOpacity = node.targetOpacity;
-        needsUpdate = true;
+
+      // Wave cascade entry animation
+      if (node.animScale !== node.targetScale || node.animOpacity !== node.targetOpacity) {
+        const delay = node.waveDelay || 0;
+        if (now - startTime >= delay) {
+          const elapsed = now - startTime - delay;
+          const duration = 550; // ms
+          const progress = Math.min(1, elapsed / duration);
+          // Ease-out cubic
+          const t = 1 - Math.pow(1 - progress, 3);
+
+          if (node.animScale !== node.targetScale) {
+            node.animScale = 0.3 + (node.targetScale - 0.3) * t;
+            if (progress >= 1) node.animScale = node.targetScale;
+            needsUpdate = true;
+          }
+          if (node.animOpacity !== node.targetOpacity) {
+            node.animOpacity = t;
+            if (progress >= 1) node.animOpacity = node.targetOpacity;
+            needsUpdate = true;
+          }
+        }
       }
 
       if (node.parentId === null) continue;

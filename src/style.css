@@ -59,6 +59,10 @@
   --pleasure-color: #2ecc71;
   --scenario-color: #3498db;
 }
+.light body {
+  background-image: radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
 
 /* --- Reset --- */
 *, *::before, *::after {
@@ -72,7 +76,9 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: var(--font);
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
   color: var(--text-primary);
   transition: background 0.4s, color 0.3s;
   -webkit-tap-highlight-color: transparent;
@@ -139,6 +145,15 @@ html, body {
 .graph-edge.dashed {
   stroke-dasharray: 6 4;
   stroke: var(--edge-dashed-color);
+}
+
+.edge-particle {
+  fill: var(--accent);
+  animation: particleFlow 1.2s ease-in-out infinite;
+}
+@keyframes particleFlow {
+  0%, 100% { opacity: 0; r: 1.5; }
+  50% { opacity: 0.8; r: 2.5; }
 }
 
 #nodes-layer {

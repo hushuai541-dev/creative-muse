@@ -115,6 +115,7 @@ export function createNode(zh, en, x, y, parentId = null, mode = 'associate', pa
     targetScale: 1, targetOpacity: 1,
     vx: 0, vy: 0, targetX: x, targetY: y,
     mode, painType, depth,
+    waveDelay: 0,
   };
 }
 

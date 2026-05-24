@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思维发散器 - 设计改进演示</title>
+<style>
+/* ===== Font Loading ===== */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+/* ===== CSS Variables (same as project for consistency) ===== */
+:root {
+  --bg: #0d0d0d;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --accent: #FFD600;
+  --accent-glow: rgba(255,214,0,0.3);
+  --text: #e0e0e0;
+  --text-secondary: #808080;
+  --text-muted: #505050;
+  --font-mono: 'DM Mono', monospace;
+  --font-body: 'Noto Sans SC', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ===== Background Texture ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ===== Demo Layout ===== */
+.demo-container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 32px;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.demo-header h1 {
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #FFD600 0%, #FFE033 50%, #FFD600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(255,214,0,0.4));
+  margin-bottom: 12px;
+}
+
+.demo-header .subtitle {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.demo-section {
+  margin-bottom: 64px;
+}
+
+.demo-section h2 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+
+.demo-section h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+/* ===== 1. Typography Comparison ===== */
+.font-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.font-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+}
+
+.font-card.old {
+  border-color: #3a3a3a;
+  opacity: 0.7;
+}
+
+.font-card.new {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(255,214,0,0.08);
+}
+
+.font-card .label {
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.font-card.new .label {
+  background: var(--accent);
+  color: #1a1a1a;
+  border-color: var(--accent);
+}
+
+.font-sample-lg {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.font-card.old .font-sample-lg {
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.font-card.new .font-sample-lg {
+  font-family: var(--font-body);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.font-sample-sm {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.font-sample-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  margin-top: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* ===== 2. Node Animation ===== */
+.node-stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 32px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+  min-height: 250px;
+  align-items: center;
+}
+
+.root-node-demo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: #1a1a1a;
+  box-shadow: 0 0 40px rgba(255,214,0,0.4);
+  position: relative;
+  z-index: 2;
+}
+
+.child-nodes {
+  display: flex;
+  gap: 24px;
+}
+
+.child-node {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1.5px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  opacity: 0;
+  transform: scale(0);
+  animation: nodeEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.child-node:nth-child(1) { animation-delay: 0.1s; }
+.child-node:nth-child(2) { animation-delay: 0.2s; }
+.child-node:nth-child(3) { animation-delay: 0.3s; }
+.child-node:nth-child(4) { animation-delay: 0.4s; }
+.child-node:nth-child(5) { animation-delay: 0.5s; }
+.child-node:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes nodeEntry {
+  0% { opacity: 0; transform: scale(0) rotate(-30deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.anim-badge {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+/* ===== 3. Homepage Layout ===== */
+.home-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.home-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+}
+
+.home-card.old {
+  opacity: 0.7;
+}
+
+.home-card.new {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(255,214,0,0.08);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 32px;
+}
+
+.home-card.new .home-hero {
+  text-align: left;
+}
+
+.home-card.new .home-title-text {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.home-card.new .home-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+.home-card.new .home-input-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.mini-input {
+  width: 200px;
+  height: 42px;
+  border-radius: 21px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 18px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.mini-btn {
+  width: 200px;
+  height: 42px;
+  border-radius: 21px;
+  border: none;
+  background: var(--accent);
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+/* ===== 4. Particle Demo ===== */
+.particle-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 32px;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.particle-trail {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: particleTravel 2.5s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--accent-glow), 0 0 12px var(--accent-glow);
+}
+
+.particle-trail:nth-child(1) { animation-delay: 0s; top: 45%; left: 20%; }
+.particle-trail:nth-child(2) { animation-delay: 0.3s; top: 40%; left: 22%; }
+.particle-trail:nth-child(3) { animation-delay: 0.6s; top: 50%; left: 18%; }
+.particle-trail:nth-child(4) { animation-delay: 0.9s; top: 35%; left: 24%; }
+.particle-trail:nth-child(5) { animation-delay: 1.2s; top: 55%; left: 16%; }
+.particle-trail:nth-child(6) { animation-delay: 1.5s; top: 42%; left: 21%; }
+.particle-trail:nth-child(7) { animation-delay: 1.8s; top: 48%; left: 19%; }
+.particle-trail:nth-child(8) { animation-delay: 2.1s; top: 38%; left: 23%; }
+
+@keyframes particleTravel {
+  0% { transform: translate(0, 0) scale(0); opacity: 0; }
+  15% { opacity: 1; }
+  50% { transform: translate(calc(60vw * 0.25), calc(-30px + random() * 60px)) scale(1.5); opacity: 0.8; }
+  85% { opacity: 1; }
+  100% { transform: translate(calc(60vw * 0.5), calc(-20px + random() * 40px)) scale(0); opacity: 0; }
+}
+
+/* ===== Action Buttons ===== */
+.demo-actions {
+  text-align: center;
+  margin-top: 48px;
+  padding-top: 48px;
+  border-top: 1px solid var(--border);
+}
+
+.demo-actions p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.demo-btn {
+  padding: 12px 32px;
+  border-radius: 24px;
+  border: none;
+  background: var(--accent);
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(255,214,0,0.2);
+}
+.demo-btn:hover { box-shadow: 0 0 32px rgba(255,214,0,0.4); transform: translateY(-1px); }
+.demo-btn.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+  margin-left: 12px;
+}
+.demo-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .font-compare, .home-compare { grid-template-columns: 1fr; }
+  .home-card.new { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="demo-container">
+
+  <div class="demo-header">
+    <h1>思维发散器 · 设计改进</h1>
+    <p class="subtitle">// design-improvement-preview</p>
+  </div>
+
+  <!-- 1. Typography -->
+  <div class="demo-section">
+    <h2>01</h2>
+    <h3>字体升级 — 从 Inter 到 Noto Sans SC + DM Mono</h3>
+    <div class="font-compare">
+      <div class="font-card old">
+        <span class="label">现方案</span>
+        <div class="font-sample-lg" style="font-family:Inter,sans-serif">输入一个词，开启灵感发散</div>
+        <div class="font-sample-sm">Inter - 通用 AI 字体，缺乏性格</div>
+      </div>
+      <div class="font-card new">
+        <span class="label">改进</span>
+        <div class="font-sample-lg">输入一个词，开启灵感发散</div>
+        <div class="font-sample-sm">Noto Sans SC - 中文字体更清晰，字重更丰富</div>
+        <div class="font-sample-mono">剩余 5 次 · plan:free · 0.001s</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Animation -->
+  <div class="demo-section">
+    <h2>02</h2>
+    <h3>节点入场动画 — 弹性缓动 + 错位延迟</h3>
+    <div class="node-stage">
+      <div class="root-node-demo">手机</div>
+      <div class="child-nodes">
+        <div class="child-node">屏幕</div>
+        <div class="child-node">充电宝</div>
+        <div class="child-node">APP</div>
+        <div class="child-node">自拍杆</div>
+        <div class="child-node">折叠屏</div>
+        <div class="child-node">无线充</div>
+      </div>
+      <span class="anim-badge">cubic-bezier(0.34,1.56,0.64,1) · delay=index*100ms</span>
+    </div>
+  </div>
+
+  <!-- 3. Homepage Layout -->
+  <div class="demo-section">
+    <h2>03</h2>
+    <h3>首页布局 — 非对称 vs ChatGPT 居中</h3>
+    <div class="home-compare">
+      <div class="home-card old">
+        <span class="label" style="background:var(--surface);border:1px solid var(--border);color:var(--text-muted);font-size:11px;border-radius:10px;padding:2px 14px">现方案 · 像 ChatGPT</span>
+        <div style="font-size:20px;font-weight:700;font-family:Inter,sans-serif">输入一个词，开启灵感发散</div>
+        <div class="mini-input">输入一个词...</div>
+        <div class="mini-btn">发散</div>
+      </div>
+      <div class="home-card new">
+        <span class="label" style="background:var(--accent);color:#1a1a1a;border-color:var(--accent);font-size:11px;border-radius:10px;padding:2px 14px;font-family:var(--font-mono)">改进 · 品牌识别</span>
+        <div class="home-hero">
+          <div class="home-title-text">发掘产品的<br>真正问题</div>
+          <div class="home-desc">痛点发散 × 场景挖掘 × 解决方案<br>AI 驱动的用户需求分析工具</div>
+        </div>
+        <div class="home-input-col">
+          <div class="mini-input" style="text-align:left">输入产品名...</div>
+          <div class="mini-btn">开始分析</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Particle Trail -->
+  <div class="demo-section">
+    <h2>04</h2>
+    <h3>发散粒子光点 — 思维电流从根节点向外辐射</h3>
+    <div class="particle-demo">
+      <div class="root-node-demo" style="position:relative;z-index:3">手机</div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <div class="particle-trail"></div>
+      <span class="anim-badge">品牌记忆点 · 光的流动</span>
+    </div>
+  </div>
+
+  <!-- 5. Background Grid -->
+  <div class="demo-section">
+    <h2>05</h2>
+    <h3>背景纹理 — SVG 噪点网格增加深度层次</h3>
+    <p style="color:var(--text-secondary);font-size:14px;line-height:1.6">
+      整页背景覆盖了 3% 透明度的 SVG 十字纹理（你当前看到的轻微颗粒感）。
+      纯黑色 <code style="color:var(--accent);font-family:var(--font-mono)">#0d0d0d</code> 变空洞，
+      加了 1KB 的 inline SVG 纹理后立即有"材料感"。更激进的话可以做成动态粒子背景。
+    </p>
+  </div>
+
+  <!-- Actions -->
+  <div class="demo-actions">
+    <p>以上是独立演示页面，不影响你的线上项目。</p>
+    <button class="demo-btn" onclick="location.reload()">重新播放动画</button>
+    <button class="demo-btn secondary" onclick="window.close()">关闭</button>
+  </div>
+
+</div>
+
+</body>
+</html>

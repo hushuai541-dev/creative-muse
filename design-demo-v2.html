@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思维发散器 · 动画 & 背景 改进 V2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #0d0d0d;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --accent: #FFD600;
+  --text: #e0e0e0;
+  --text-secondary: #808080;
+  --text-muted: #505050;
+  --font: 'Noto Sans SC', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); }
+
+/* ===== Page Layout ===== */
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.page h1 {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(255,214,0,0.4);
+}
+.page .intro { text-align: center; color: var(--text-secondary); margin-bottom: 56px; font-size: 14px; }
+
+.section-title {
+  font-size: 13px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+.section-subtitle { font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+
+/* ===== Common Stage ===== */
+.stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 28px;
+  margin-bottom: 16px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.stage .center-node {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 16px; color: #1a1a1a;
+  box-shadow: 0 0 36px rgba(255,214,0,0.35);
+  z-index: 2; flex-shrink: 0;
+  position: relative;
+}
+.stage .child-ring {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  justify-content: center; max-width: 460px;
+}
+.stage .leaf {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--text); opacity: 0;
+}
+.stage .label {
+  position: absolute; bottom: 12px; right: 16px;
+  font-size: 11px; color: var(--text-muted); letter-spacing: 0.03em;
+}
+
+/* ===== ANIMATION A: Bloom + Drift ===== */
+.anim-a .leaf {
+  animation: bloomDrift 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
+}
+.anim-a .leaf:nth-child(1) { animation-delay: 0.00s; }
+.anim-a .leaf:nth-child(2) { animation-delay: 0.05s; }
+.anim-a .leaf:nth-child(3) { animation-delay: 0.10s; }
+.anim-a .leaf:nth-child(4) { animation-delay: 0.15s; }
+.anim-a .leaf:nth-child(5) { animation-delay: 0.20s; }
+.anim-a .leaf:nth-child(6) { animation-delay: 0.25s; }
+.anim-a .leaf:nth-child(7) { animation-delay: 0.30s; }
+.anim-a .leaf:nth-child(8) { animation-delay: 0.35s; }
+
+@keyframes bloomDrift {
+  0% { opacity: 0; transform: translate(0, 0) scale(0); filter: blur(8px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1); filter: blur(0); }
+}
+
+/* ===== ANIMATION B: Orbital Spawn ===== */
+.anim-b .leaf {
+  animation: orbitalSpawn 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.anim-b .leaf:nth-child(1) { animation-delay: 0.00s; }
+.anim-b .leaf:nth-child(2) { animation-delay: 0.06s; }
+.anim-b .leaf:nth-child(3) { animation-delay: 0.12s; }
+.anim-b .leaf:nth-child(4) { animation-delay: 0.18s; }
+.anim-b .leaf:nth-child(5) { animation-delay: 0.24s; }
+.anim-b .leaf:nth-child(6) { animation-delay: 0.30s; }
+.anim-b .leaf:nth-child(7) { animation-delay: 0.36s; }
+.anim-b .leaf:nth-child(8) { animation-delay: 0.42s; }
+
+@keyframes orbitalSpawn {
+  0% { opacity: 0; transform: rotate(90deg) translateY(80px) scale(0.2); }
+  70% { opacity: 1; }
+  100% { opacity: 1; transform: rotate(0deg) translateY(0) scale(1); }
+}
+
+/* ===== ANIMATION C: Wave Cascade ===== */
+.anim-c .leaf {
+  animation: waveCascade 0.55s ease-out forwards;
+}
+.anim-c .leaf:nth-child(1) { animation-delay: 0.00s; }
+.anim-c .leaf:nth-child(2) { animation-delay: 0.08s; }
+.anim-c .leaf:nth-child(3) { animation-delay: 0.16s; }
+.anim-c .leaf:nth-child(4) { animation-delay: 0.24s; }
+.anim-c .leaf:nth-child(5) { animation-delay: 0.32s; }
+.anim-c .leaf:nth-child(6) { animation-delay: 0.40s; }
+.anim-c .leaf:nth-child(7) { animation-delay: 0.48s; }
+.anim-c .leaf:nth-child(8) { animation-delay: 0.56s; }
+
+@keyframes waveCascade {
+  0% { opacity: 0; transform: translateY(60px) scale(0.3); }
+  60% { opacity: 1; transform: translateY(-4px) scale(1.05); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== BACKGROUND TEXTURES ===== */
+.texture-stage {
+  height: 200px; border-radius: 16px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.texture-stage .t-label {
+  position: absolute; bottom: 12px; right: 16px;
+  font-size: 11px; color: var(--text-muted);
+  background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 8px;
+}
+.texture-stage .t-preview {
+  text-align: center; z-index: 1;
+}
+.texture-stage .t-preview .dot {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--accent); margin: 0 auto 12px;
+  box-shadow: 0 0 40px rgba(255,214,0,0.3);
+}
+.texture-stage .t-preview .txt {
+  font-size: 14px; color: var(--text);
+}
+
+/* T1: Dot Grid (Figma-style) */
+.bg-dot-grid {
+  background-color: #0d0d0d;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* T2: Subtle Noise + Vignette */
+.bg-noise-vignette {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255,214,0,0.03) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.02) 0%, transparent 50%),
+    #0d0d0d;
+}
+.bg-noise-vignette::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* T3: Diagonal Lines */
+.bg-diagonal {
+  background-color: #0d0d0d;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.015) 2px,
+    rgba(255,255,255,0.015) 4px
+  );
+}
+
+/* T4: Hex Grid */
+.bg-hex {
+  background-color: #0d0d0d;
+  background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 3l12 6v12l-12 6-12-6V9z' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+}
+
+/* T5: Gradient Glow (simple & elegant) */
+.bg-glow {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,214,0,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255,214,0,0.03) 0%, transparent 50%),
+    #0d0d0d;
+}
+
+/* ===== Controls ===== */
+.controls {
+  display: flex; gap: 8px; justify-content: center; margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+.controls button {
+  padding: 10px 22px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-secondary);
+  font-size: 13px; cursor: pointer; font-family: var(--font);
+  transition: all 0.15s;
+}
+.controls button:hover, .controls button.active {
+  border-color: var(--accent); color: var(--accent);
+}
+.controls button.active { background: rgba(255,214,0,0.08); }
+
+.anim-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.texture-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+@media (max-width: 700px) {
+  .anim-row, .texture-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>设计改进 V2</h1>
+  <p class="intro">节点入场动画 ×3 &nbsp;|&nbsp; 背景纹理 ×5</p>
+
+  <!-- ===== NODE ANIMATIONS ===== -->
+  <p class="section-title">ANIMATION</p>
+  <p class="section-subtitle">节点入场动画 — 三种方案</p>
+
+  <div class="anim-row">
+
+    <!-- A: Bloom + Drift -->
+    <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div class="stage anim-a" style="border-radius:0;border:none;margin:0">
+        <div class="center-node">手机</div>
+        <div class="child-ring">
+          <div class="leaf" style="--dx:-30px;--dy:-20px">屏幕</div>
+          <div class="leaf" style="--dx:20px;--dy:-30px">充电宝</div>
+          <div class="leaf" style="--dx:35px;--dy:5px">APP</div>
+          <div class="leaf" style="--dx:25px;--dy:25px">自拍杆</div>
+          <div class="leaf" style="--dx:-5px;--dy:30px">无线充</div>
+          <div class="leaf" style="--dx:-25px;--dy:15px">折叠屏</div>
+          <div class="leaf" style="--dx:-35px;--dy:-5px">5G</div>
+          <div class="leaf" style="--dx:10px;--dy:-35px">拍照</div>
+        </div>
+        <span class="label">A · 绽放漂移</span>
+      </div>
+      <div style="padding:12px 16px;background:rgba(0,0,0,0.3);font-size:12px;color:var(--text-secondary);line-height:1.6">
+        子节点从中心向外漂移，带轻微模糊消散。<br>每个延迟 50ms，产生连续绽放感。
+      </div>
+    </div>
+
+    <!-- B: Orbital Spawn -->
+    <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div class="stage anim-b" style="border-radius:0;border:none;margin:0">
+        <div class="center-node">手机</div>
+        <div class="child-ring">
+          <div class="leaf">屏幕</div>
+          <div class="leaf">充电宝</div>
+          <div class="leaf">APP</div>
+          <div class="leaf">自拍杆</div>
+          <div class="leaf">无线充</div>
+          <div class="leaf">折叠屏</div>
+          <div class="leaf">5G</div>
+          <div class="leaf">拍照</div>
+        </div>
+        <span class="label">B · 轨道回旋</span>
+      </div>
+      <div style="padding:12px 16px;background:rgba(0,0,0,0.3);font-size:12px;color:var(--text-secondary);line-height:1.6">
+        节点从侧方旋转飞入，像卫星入轨。<br>有向心力感，适合分析类工具。
+      </div>
+    </div>
+
+    <!-- C: Wave Cascade -->
+    <div style="border:1px solid var(--border);border-radius:16px;overflow-hidden">
+      <div class="stage anim-c" style="border-radius:0;border:none;margin:0">
+        <div class="center-node">手机</div>
+        <div class="child-ring">
+          <div class="leaf">屏幕</div>
+          <div class="leaf">充电宝</div>
+          <div class="leaf">APP</div>
+          <div class="leaf">自拍杆</div>
+          <div class="leaf">无线充</div>
+          <div class="leaf">折叠屏</div>
+          <div class="leaf">5G</div>
+          <div class="leaf">拍照</div>
+        </div>
+        <span class="label">C · 波浪层叠</span>
+      </div>
+      <div style="padding:12px 16px;background:rgba(0,0,0,0.3);font-size:12px;color:var(--text-secondary);line-height:1.6">
+        节点从下方波浪式升起，轻微回弹。<br>流畅利落，不喧宾夺主。
+      </div>
+    </div>
+
+  </div>
+
+  <button style="margin:20px auto;display:block" onclick="replayAnims()">🔁 重新播放动画</button>
+
+  <!-- ===== BACKGROUND TEXTURES ===== -->
+  <p class="section-title" style="margin-top:56px">BACKGROUND</p>
+  <p class="section-subtitle">背景纹理 — 五种方案</p>
+
+  <div class="texture-row">
+
+    <div>
+      <div class="texture-stage bg-dot-grid">
+        <div class="t-preview"><div class="dot"></div><div class="txt">Figma 点阵</div></div>
+        <span class="t-label">T1</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);padding:0 4px;line-height:1.6">
+        20px 间距的微弱点阵。<br>像设计工具的画布，熟悉的专业感。
+      </div>
+    </div>
+
+    <div>
+      <div class="texture-stage bg-noise-vignette">
+        <div class="t-preview"><div class="dot"></div><div class="txt">噪点 + 暗角</div></div>
+        <span class="t-label">T2</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);padding:0 4px;line-height:1.6">
+        SVG 噪点滤镜 + 径向暗角。<br>微妙的材质感，像磨砂玻璃。
+      </div>
+    </div>
+
+    <div>
+      <div class="texture-stage bg-diagonal">
+        <div class="t-preview"><div class="dot"></div><div class="txt">斜纹线条</div></div>
+        <span class="t-label">T3</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);padding:0 4px;line-height:1.6">
+        45° 重复细线。<br>极简但有方向感，不抢眼。
+      </div>
+    </div>
+
+    <div>
+      <div class="texture-stage bg-hex">
+        <div class="t-preview"><div class="dot"></div><div class="txt">六边形网格</div></div>
+        <span class="t-label">T4</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);padding:0 4px;line-height:1.6">
+        蜂巢六边形 SVG 纹理。<br>科技感强，和思维导图主题契合。
+      </div>
+    </div>
+
+    <div>
+      <div class="texture-stage bg-glow">
+        <div class="t-preview"><div class="dot"></div><div class="txt">柔和光晕</div></div>
+        <span class="t-label">T5</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);padding:0 4px;line-height:1.6">
+        两个淡黄色径向渐变。<br>最简单，只有光没有纹理。
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;margin-top:48px;padding-top:32px;border-top:1px solid var(--border)">
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:16px">选中方案后告诉我，我把它落地到你的项目</p>
+  </div>
+
+</div>
+
+<script>
+function replayAnims() {
+  document.querySelectorAll('.leaf').forEach(el => {
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = '';
+  });
+}
+</script>
+</body>
+</html>
