@@ -108,19 +108,16 @@ app.post('/api/pain-points', async (req, res) => {
     return res.status(400).json({ error: 'word is required' });
   }
 
-  const systemPrompt = '你是一个用户体验研究助手，擅长从用户视角发现一个事物或场景中的痛点、爽点和高频使用场景。你只返回JSON数组，不返回其他内容。';
+  const systemPrompt = '你是一个痛点分析专家，擅长从用户视角深度挖掘一个事物或场景中的具体痛点。你只返回JSON数组，不返回其他内容。';
 
-  const userPrompt = `用户输入了"${word}"，请从用户体验角度进行分析。返回6个条目：
-
-- 2个痛点（type: "pain"）：用户最常遇到的困扰、不便、负面体验
-- 2个爽点（type: "pleasure"）：用户感到愉悦、满足、上瘾的体验
-- 2个高频场景（type: "scenario"）：用户最常使用"${word}"的具体情境
+  const userPrompt = `用户输入了"${word}"，请从用户体验角度进行分析，返回6个用户痛点：
 
 要求：
-1. 每个条目必须具体、生动，让人产生共鸣
-2. 痛点要真实，爽点要具体，场景要鲜活
-3. 每个条目包含 zh（中文短语）、en（英文短语）、type（pain/pleasure/scenario）三个字段
-4. 严格按JSON数组返回：[{"zh": "...", "en": "...", "type": "pain"}, ...]`;
+1. 每个痛点必须具体、真实，让人感到"对，我也有这个问题"
+2. 痛点要有画面感，能从不同角度挖掘（如使用不便、心理负担、时间成本、安全隐患等）
+3. 优先选择高频、高痛感的痛点，避免牵强附会
+4. 每个条目包含 zh（中文短语）、en（英文短语）、type（统一为 "pain"）三个字段
+5. 严格按JSON数组返回：[{"zh": "...", "en": "...", "type": "pain"}, ...]`;
 
   try {
     const response = await fetch(`${DEEPSEEK_BASE_URL}/v1/chat/completions`, {
