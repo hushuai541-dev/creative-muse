@@ -5,75 +5,42 @@ import { expandWord, expandPainPoints, expandScenario, expandSolution } from './
 import * as Graph from './graph.js';
 import * as Input from './input.js';
 import * as History from './history.js';
+import * as Auth from './auth.js';
+import { showOnboarding } from './onboarding.js';
 
 // Theme
 const THEME_KEY = 'creative-muse-theme';
 let isLight = false;
 
-// Usage tracking
-const USAGE_KEY = 'creative-muse-usage';
-const FREE_DAILY_LIMIT = 5;
-let usageCount = 0;
-let usageDate = '';
-
-// Plan state (free / basic / pro)
-const PLAN_KEY = 'creative-muse-plan';
-let currentPlan = 'free';
-let basicRemaining = 0; // remaining uses for basic plan
-
 let currentWord = '';
+let remainingUsage = { remaining: 5, plan: 'free', permanentTokens: 0 };
 
-function loadUsage() {
-  try {
-    const raw = localStorage.getItem(USAGE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const today = new Date().toDateString();
-      if (data.date === today) {
-        usageCount = data.count || 0;
-      } else {
-        usageCount = 0;
-      }
-      usageDate = today;
-    } else {
-      usageDate = new Date().toDateString();
-      usageCount = 0;
+async function updateRemaining() {
+  if (Auth.isLoggedIn()) {
+    try {
+      remainingUsage = await Auth.getRemaining();
+    } catch {
+      remainingUsage = { remaining: 5, plan: 'free', permanentTokens: 0 };
     }
-    currentPlan = localStorage.getItem(PLAN_KEY) || 'free';
-    if (currentPlan === 'basic') {
-      basicRemaining = parseInt(localStorage.getItem('creative-muse-basic-remaining') || '0');
-    }
-  } catch {
-    usageCount = 0;
-    usageDate = new Date().toDateString();
-    currentPlan = 'free';
-  }
-}
-
-function saveUsage() {
-  try {
-    localStorage.setItem(USAGE_KEY, JSON.stringify({ date: usageDate, count: usageCount }));
-    localStorage.setItem(PLAN_KEY, currentPlan);
-    if (currentPlan === 'basic') {
-      localStorage.setItem('creative-muse-basic-remaining', String(basicRemaining));
-    }
-  } catch { /* ignore */ }
-}
-
-function canUse() {
-  if (currentPlan === 'pro') return true;
-  if (currentPlan === 'basic') return basicRemaining > 0;
-  return usageCount < FREE_DAILY_LIMIT;
-}
-
-function incrementUsage() {
-  if (currentPlan === 'pro') return;
-  if (currentPlan === 'basic') {
-    basicRemaining--;
   } else {
-    usageCount++;
+    remainingUsage = { remaining: 5, plan: 'free', permanentTokens: 0 };
   }
-  saveUsage();
+  updateUsageDisplay();
+}
+
+async function canUse() {
+  if (!Auth.isLoggedIn()) return remainingUsage.remaining > 0;
+  await updateRemaining();
+  return remainingUsage.remaining > 0 || remainingUsage.plan === 'pro';
+}
+
+async function incrementUsage() {
+  if (!Auth.isLoggedIn()) {
+    remainingUsage.remaining--;
+    return;
+  }
+  await Auth.spendOneUse();
+  await updateRemaining();
 }
 
 function showPricingModal() {
@@ -87,14 +54,27 @@ function hidePricingModal() {
 // --- Init ---
 
 function init() {
-  loadUsage();
   initTheme();
   initGraph();
   initInput();
   initHistory();
   initButtons();
   initPricing();
-  updateUsageDisplay();
+  updateRemaining().then(() => {
+    showOnboarding(() => {});
+  });
+
+  // Check for word from homepage
+  const params = new URLSearchParams(window.location.search);
+  const word = params.get('word');
+  if (word && Auth.isLoggedIn()) {
+    setTimeout(() => {
+      document.getElementById('word-input').value = word;
+      document.getElementById('submit-btn').click();
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+    }, 500);
+  }
 }
 
 function initGraph() {
@@ -263,21 +243,18 @@ function initPricing() {
     if (e.target === e.currentTarget) hidePricingModal();
   });
   document.querySelectorAll('.pricing-btn.primary').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const plan = btn.dataset.plan;
-      if (plan === 'basic') {
-        currentPlan = 'basic';
-        basicRemaining = 10;
-        saveUsage();
-        updateUsageDisplay();
+      try {
+        if (Auth.isLoggedIn()) {
+          await Auth.upgradePlan(plan);
+        }
+        remainingUsage.plan = plan;
         hidePricingModal();
-        alert('已升级至基础版！畅享 10 次发散。');
-      } else if (plan === 'pro') {
-        currentPlan = 'pro';
-        saveUsage();
         updateUsageDisplay();
-        hidePricingModal();
-        alert('已升级至 Pro 版！无限发散，畅快使用。');
+        alert(plan === 'pro' ? '已升级至 Pro 版！' : '已升级至基础版！');
+      } catch (err) {
+        alert('升级失败：' + err.message);
       }
     });
   });

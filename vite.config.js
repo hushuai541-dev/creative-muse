@@ -15,6 +15,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         view: 'view.html',
+        home: 'home.html',
       },
     },
   },

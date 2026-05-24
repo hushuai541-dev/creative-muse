@@ -6,77 +6,45 @@
   <title>创意发散 - Creative Muse</title>
 </head>
 <body>
-  <div id="app">
-    <!-- Back to home -->
-    <a href="/home" class="back-home-btn" title="返回首页">←</a>
+  <div id="home-app">
+    <!-- Top bar -->
+    <div id="home-topbar">
+      <span class="home-logo">Creative Muse</span>
+      <button id="home-login-btn" class="home-login-btn">登录</button>
+    </div>
 
-    <!-- Dark mode toggle -->
-    <button id="theme-toggle" class="theme-toggle" title="切换主题">🌙</button>
+    <!-- Main -->
+    <div id="home-main">
+      <h1 class="home-title">输入一个词，开启灵感发散</h1>
 
-    <!-- Canvas area -->
-    <div id="canvas-container">
-      <svg id="edges-svg"></svg>
-      <div id="nodes-layer"></div>
-      <!-- Welcome state -->
-      <div id="welcome-hint" class="welcome-hint">
-        <span class="welcome-icon">✨</span>
-        <span>输入一个词，开始发散联想</span>
+      <div class="home-input-area">
+        <input id="home-word-input" type="text" placeholder="输入一个词..." autocomplete="off" />
+        <button id="home-submit-btn" class="submit-btn">发散</button>
+      </div>
+
+      <div class="home-hot-tags">
+        <span class="home-hot-label">热门：</span>
+      </div>
+
+      <p id="home-remaining" class="home-remaining">今日剩余免费 5 次</p>
+    </div>
+
+    <!-- Login modal -->
+    <div id="login-overlay" class="pricing-overlay hidden">
+      <div class="login-modal">
+        <button id="login-close" class="pricing-close">✕</button>
+        <h3>输入昵称开始使用</h3>
+        <input id="login-name-input" type="text" placeholder="你的昵称" maxlength="20" />
+        <button id="login-submit-btn" class="pricing-btn primary">进入</button>
       </div>
     </div>
 
-    <!-- Input area -->
-    <div id="input-area" class="input-area centered">
-      <input
-        id="word-input"
-        type="text"
-        placeholder="输入一个词..."
-        autocomplete="off"
-      />
-      <button id="submit-btn" class="submit-btn">发散</button>
-    </div>
-
-    <!-- Zoom controls -->
-    <div id="zoom-controls" class="zoom-controls">
-      <button id="zoom-in" title="放大">+</button>
-      <span id="zoom-level">100%</span>
-      <button id="zoom-out" title="缩小">−</button>
-      <button id="fit-view" title="适应视图">⊡</button>
-      <button id="clear-canvas" title="清空画布">✕</button>
-    </div>
-
-    <!-- Minimap -->
-    <canvas id="minimap-canvas" width="160" height="100"></canvas>
-
-    <!-- History toggle button -->
-    <button id="history-toggle" class="history-toggle" title="历史记录">☰</button>
-
-    <!-- Export button -->
-    <button id="export-image" class="export-btn" title="导出图片">⬇</button>
-    <button id="export-markdown" class="export-btn" title="导出MD" style="top:116px">📋</button>
-    <button id="share-link" class="export-btn" title="分享链接" style="top:164px">🔗</button>
-
-    <!-- History drawer -->
-    <div id="history-drawer" class="history-drawer">
-      <div class="history-header">
-        <h3>历史记录</h3>
-        <button id="history-close" class="close-btn">✕</button>
-      </div>
-      <div id="history-list" class="history-list"></div>
-    </div>
-
-    <!-- History overlay (for closing drawer on outside click) -->
-    <div id="history-overlay" class="history-overlay hidden"></div>
-
-    <!-- Undo toast -->
-    <div id="undo-toast" class="undo-toast hidden">已撤销</div>
-
-    <!-- Pricing overlay -->
+    <!-- Pricing overlay (reused from main) -->
     <div id="pricing-overlay" class="pricing-overlay hidden">
       <div class="pricing-modal">
         <button id="pricing-close" class="pricing-close">✕</button>
         <h2 class="pricing-title">升级套餐</h2>
         <div class="pricing-cards">
-          <!-- Free -->
           <div class="pricing-card current-plan" id="plan-free">
             <div class="pricing-plan-name">免费版</div>
             <div class="pricing-price"><span class="pricing-currency">¥</span>0<span class="pricing-period">/月</span></div>
@@ -86,7 +54,6 @@
               <li><span class="pricing-check">✓</span> 每天免费 5 次消息发散</li>
             </ul>
           </div>
-          <!-- Basic -->
           <div class="pricing-card" id="plan-basic">
             <div class="pricing-plan-name">基础版</div>
             <div class="pricing-price"><span class="pricing-currency">¥</span>3.9<span class="pricing-period">/10次</span></div>
@@ -96,7 +63,6 @@
               <li><span class="pricing-check">✓</span> 畅聊 10 次，更多体验</li>
             </ul>
           </div>
-          <!-- Pro -->
           <div class="pricing-card" id="plan-pro">
             <div class="pricing-badge">🔥 热门</div>
             <div class="pricing-plan-name">Pro 版</div>
@@ -112,7 +78,6 @@
       </div>
     </div>
   </div>
-
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/home.js"></script>
 </body>
 </html>

@@ -5,6 +5,8 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import * as Auth from './auth.js';
+import * as Invite from './invite.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
@@ -280,6 +282,94 @@ app.post('/api/solution', async (req, res) => {
   }
 });
 
+// Auth endpoints
+app.post('/api/auth/login', (req, res) => {
+  const { name } = req.body;
+  if (!name || typeof name !== 'string' || name.trim().length < 1) {
+    return res.status(400).json({ error: '昵称不能为空' });
+  }
+  try {
+    const { user, token, isNew } = Auth.login(name.trim());
+    const remaining = Auth.getRemainingUsage(user.id);
+    res.json({ user: { id: user.id, name: user.name, plan: user.plan, inviteCode: user.inviteCode }, token, isNew, remaining });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/auth/me', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: '未登录' });
+  const user = Auth.getUserByToken(token);
+  if (!user) return res.status(401).json({ error: '登录已过期' });
+  const remaining = Auth.getRemainingUsage(user.id);
+  res.json({ user: { id: user.id, name: user.name, plan: user.plan, inviteCode: user.inviteCode }, remaining });
+});
+
+app.post('/api/auth/upgrade', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: '未登录' });
+  const user = Auth.getUserByToken(token);
+  if (!user) return res.status(401).json({ error: '登录已过期' });
+  const { plan } = req.body;
+  if (!plan || !['free', 'basic', 'pro'].includes(plan)) {
+    return res.status(400).json({ error: '无效的套餐' });
+  }
+  const updated = Auth.updateUser(user.id, { plan });
+  res.json({ user: { id: updated.id, name: updated.name, plan: updated.plan, inviteCode: updated.inviteCode } });
+});
+
+// Usage check endpoint
+app.get('/api/auth/usage', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: '未登录' });
+  const user = Auth.getUserByToken(token);
+  if (!user) return res.status(401).json({ error: '登录已过期' });
+  const remaining = Auth.getRemainingUsage(user.id);
+  res.json(remaining);
+});
+
+app.post('/api/auth/use', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: '未登录' });
+  const user = Auth.getUserByToken(token);
+  if (!user) return res.status(401).json({ error: '登录已过期' });
+  const ok = Auth.spendToken(user.id);
+  const remaining = Auth.getRemainingUsage(user.id);
+  res.json({ ok, remaining });
+});
+
+// Invite endpoints
+app.post('/api/invite/redeem', (req, res) => {
+  const { inviteCode, userId, name } = req.body;
+  if (!inviteCode || !name) {
+    return res.status(400).json({ error: '参数不全' });
+  }
+  try {
+    // Create or get user
+    const { user, token, isNew } = Auth.login(name.trim());
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const ua = req.headers['user-agent'] || 'unknown';
+    const result = Invite.redeemInvite(inviteCode, user.id, ip, ua);
+    if (result.success) {
+      const remaining = Auth.getRemainingUsage(user.id);
+      res.json({ success: true, reward: result.reward, user: { id: user.id, name: user.name, plan: user.plan, inviteCode: user.inviteCode }, token, remaining });
+    } else {
+      res.json({ success: false, error: result.error, token, user: { id: user.id, name: user.name } });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/invite/stats', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: '未登录' });
+  const user = Auth.getUserByToken(token);
+  if (!user) return res.status(401).json({ error: '登录已过期' });
+  res.json(Invite.getInviteStats(user.id));
+});
+
 // Share endpoints
 app.post('/api/share', (req, res) => {
   const { graphState, projectName } = req.body;
@@ -311,6 +401,10 @@ app.get('/api/share/:id', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(distPath, 'home.html'));
 });
 
 app.get('/view/:id', (req, res) => {
