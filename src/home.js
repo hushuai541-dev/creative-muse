@@ -110,6 +110,13 @@ async function showProfile() {
   document.getElementById('profile-remaining').textContent = remaining.remaining === Infinity ? '无限' : String(remaining.remaining);
   document.getElementById('profile-invites').textContent = stats.inviteCount + ' 人';
   document.getElementById('profile-code').textContent = user.inviteCode;
+  document.getElementById('profile-code').onclick = async () => {
+    const link = `${window.location.origin}/home?ref=${user.inviteCode}`;
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(link);
+      alert('邀请链接已复制！');
+    }
+  };
 
   document.getElementById('profile-overlay').classList.remove('hidden');
 }

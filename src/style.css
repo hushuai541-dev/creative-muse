@@ -1049,6 +1049,12 @@ html, body {
   font-family: monospace;
   font-size: 13px;
   letter-spacing: 0.05em;
+  cursor: pointer;
+  user-select: all;
+  transition: color 0.15s;
+}
+.profile-value.code:hover {
+  color: var(--accent);
 }
 .profile-actions {
   display: flex;
@@ -1061,6 +1067,7 @@ html, body {
 }
 .profile-invite-redeem input {
   flex: 1;
+  min-width: 0;
   height: 36px;
   padding: 0 12px;
   border-radius: 10px;
