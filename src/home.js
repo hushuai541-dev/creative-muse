@@ -5,10 +5,33 @@ import * as Auth from './auth.js';
 
 function init() {
   initLoginUI();
+  initProfileModal();
   initInput();
   initPricing();
   updateUsageDisplay();
   checkInviteCode();
+}
+
+function initProfileModal() {
+  document.getElementById('profile-close').addEventListener('click', () => {
+    document.getElementById('profile-overlay').classList.add('hidden');
+  });
+  document.getElementById('profile-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) document.getElementById('profile-overlay').classList.add('hidden');
+  });
+  document.getElementById('profile-copy-link').addEventListener('click', async () => {
+    const user = Auth.getUser();
+    if (!user) return;
+    const link = `${window.location.origin}/home?ref=${user.inviteCode}`;
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(link);
+      alert('邀请链接已复制！');
+    }
+  });
+  document.getElementById('profile-upgrade').addEventListener('click', () => {
+    document.getElementById('profile-overlay').classList.add('hidden');
+    showPricingModal();
+  });
 }
 
 function initLoginUI() {
@@ -64,20 +87,14 @@ async function showProfile() {
   const user = Auth.getUser();
   const remaining = await Auth.getRemaining();
   const inviteLink = `${window.location.origin}/home?ref=${user.inviteCode}`;
-  const msg = [
-    `昵称：${user.name}`,
-    `套餐：${remaining.plan === 'pro' ? 'Pro 无限' : remaining.plan === 'basic' ? '基础版' : '免费版'}`,
-    `剩余次数：${remaining.remaining === Infinity ? '无限' : remaining.remaining}`,
-    `已邀请：${stats.inviteCount} 人`,
-    ``,
-    `邀请链接：${inviteLink}`,
-  ].join('\n');
-  if (navigator.clipboard && confirm(msg + '\n\n复制邀请链接？')) {
-    await navigator.clipboard.writeText(inviteLink);
-    alert('邀请链接已复制！好友通过链接访问并注册，双方各得 5 次。');
-  } else {
-    alert(msg);
-  }
+
+  document.getElementById('profile-name-display').textContent = user.name;
+  document.getElementById('profile-plan').textContent = remaining.plan === 'pro' ? 'Pro 无限' : remaining.plan === 'basic' ? '基础版' : '免费版';
+  document.getElementById('profile-remaining').textContent = remaining.remaining === Infinity ? '无限' : String(remaining.remaining);
+  document.getElementById('profile-invites').textContent = stats.inviteCount + ' 人';
+  document.getElementById('profile-code').textContent = user.inviteCode;
+
+  document.getElementById('profile-overlay').classList.remove('hidden');
 }
 
 function initInput() {
