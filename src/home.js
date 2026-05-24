@@ -100,6 +100,8 @@ function hideLoginModal() {
 }
 
 async function showProfile() {
+  // Refresh from server
+  try { await Auth.fetchMe(); } catch {}
   const stats = await Auth.getInviteStats();
   const user = Auth.getUser();
   const remaining = await Auth.getRemaining();
