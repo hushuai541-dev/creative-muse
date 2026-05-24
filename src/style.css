@@ -916,6 +916,7 @@ html, body {
   font-weight: 700;
   color: var(--accent);
   letter-spacing: 0.03em;
+  text-shadow: 0 0 16px rgba(255, 214, 0, 0.5);
 }
 .home-login-btn {
   padding: 8px 20px;
