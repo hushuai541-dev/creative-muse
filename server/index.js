@@ -315,7 +315,12 @@ app.post('/api/auth/upgrade', (req, res) => {
   if (!plan || !['free', 'basic', 'pro'].includes(plan)) {
     return res.status(400).json({ error: '无效的套餐' });
   }
-  const updated = Auth.updateUser(user.id, { plan });
+  const updates = { plan };
+  if (plan === 'basic') {
+    const currentBasic = user.basicRemaining || 0;
+    updates.basicRemaining = currentBasic + 10;
+  }
+  const updated = Auth.updateUser(user.id, updates);
   res.json({ user: { id: updated.id, name: updated.name, plan: updated.plan, inviteCode: updated.inviteCode } });
 });
 

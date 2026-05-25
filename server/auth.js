@@ -128,10 +128,20 @@ export function spendToken(userId) {
     return true;
   }
 
-  // Free daily limit
+  // Pro: unlimited
   if (user.plan === 'pro') return true;
-  const limit = user.plan === 'basic' ? (user.basicRemaining || 0) : 5;
-  if (usage.count < limit) {
+
+  // Basic: use paid quota first (one-time, not daily)
+  if (user.plan === 'basic' && (user.basicRemaining || 0) > 0) {
+    user.basicRemaining--;
+    const users = readUsers();
+    users[userId] = user;
+    writeUsers(users);
+    return true;
+  }
+
+  // Free daily limit (free plan, or basic plan after paid quota exhausted)
+  if (usage.count < 5) {
     usage.count++;
     user.dailyUsage = usage;
     const users = readUsers();
@@ -149,12 +159,20 @@ export function getRemainingUsage(userId) {
   if (user.plan === 'pro') return { remaining: Infinity, plan: 'pro', permanentTokens: user.permanentTokens };
   const today = getTodayKey();
   const count = user.dailyUsage.date === today ? user.dailyUsage.count : 0;
-  const limit = user.plan === 'basic' ? (user.basicRemaining || 0) : 5;
-  const dailyRemaining = Math.max(0, limit - count);
+  const dailyRemaining = Math.max(0, 5 - count);
+  if (user.plan === 'basic') {
+    const basicRem = user.basicRemaining || 0;
+    return {
+      remaining: basicRem + dailyRemaining + user.permanentTokens,
+      dailyRemaining,
+      basicRemaining: basicRem,
+      permanentTokens: user.permanentTokens,
+      plan: user.plan,
+    };
+  }
   return {
     remaining: dailyRemaining + user.permanentTokens,
     dailyRemaining,
     permanentTokens: user.permanentTokens,
     plan: user.plan,
   };
-}
