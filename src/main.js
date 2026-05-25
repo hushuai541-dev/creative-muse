@@ -269,25 +269,61 @@ async function onPopupAction(nodeId, word, mode) {
 
 // --- Graph Change ---
 
+let pendingPlan = null;
+
+function showPaymentStep(plan) {
+  pendingPlan = plan;
+  const price = plan === 'pro' ? '19.90' : '3.90';
+  const name = plan === 'pro' ? 'Pro 版' : '基础版';
+  const content = document.getElementById('pricing-content');
+  content.innerHTML = `
+    <button id="pricing-close" class="pricing-close">✕</button>
+    <h2 class="pricing-title">扫码支付</h2>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);margin-bottom:4px">¥${price}</div>
+      <div style="font-size:14px;color:var(--text-secondary)">${name}</div>
+    </div>
+    <div style="width:200px;height:200px;margin:0 auto 20px;border:2px dashed var(--border);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;text-align:center;background:var(--surface-bg)">
+      <span>此处放你的<br>微信收款码图片</span>
+    </div>
+    <ol style="font-size:13px;color:var(--text-secondary);line-height:2;padding-left:20px;margin-bottom:20px">
+      <li>微信扫描上方二维码付款</li>
+      <li>付款后点击下方按钮</li>
+      <li>管理员确认后自动开通</li>
+    </ol>
+    <button id="pay-confirm" class="pricing-btn primary" style="width:100%">我已支付，开通${name}</button>
+    <button id="pay-back" style="width:100%;padding:8px;margin-top:8px;border-radius:10px;border:1px solid var(--surface-border);background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:var(--font)">← 返回选择套餐</button>
+  `;
+  document.getElementById('pricing-close').addEventListener('click', hidePricingModal);
+  document.getElementById('pay-back').addEventListener('click', () => {
+    pendingPlan = null;
+    hidePricingModal();
+    setTimeout(showPricingModal, 200);
+  });
+  document.getElementById('pay-confirm').addEventListener('click', async () => {
+    try {
+      if (Auth.isLoggedIn()) {
+        await Auth.upgradePlan(pendingPlan);
+      }
+      await updateRemaining();
+      hidePricingModal();
+      updateUsageDisplay();
+      alert(`已开通${name}！`);
+    } catch (err) {
+      alert('开通失败：' + err.message);
+    }
+  });
+}
+
 function initPricing() {
   document.getElementById('pricing-close').addEventListener('click', hidePricingModal);
   document.getElementById('pricing-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) hidePricingModal();
   });
   document.querySelectorAll('.pricing-btn.primary').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', () => {
       const plan = btn.dataset.plan;
-      try {
-        if (Auth.isLoggedIn()) {
-          await Auth.upgradePlan(plan);
-        }
-        await updateRemaining();
-        hidePricingModal();
-        updateUsageDisplay();
-        alert(plan === 'pro' ? '已升级至 Pro 版！' : '已升级至基础版！');
-      } catch (err) {
-        alert('升级失败：' + err.message);
-      }
+      showPaymentStep(plan);
     });
   });
 }
