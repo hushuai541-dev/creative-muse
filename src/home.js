@@ -141,12 +141,17 @@ function initInput() {
 }
 
 let pendingPlan = null;
+let savedPricingHTML = null;
 
 function showPaymentStep(plan) {
   pendingPlan = plan;
   const price = plan === 'pro' ? '19.90' : '3.90';
   const name = plan === 'pro' ? 'Pro 版' : '基础版';
   const content = document.getElementById('pricing-content');
+  // Save original plan cards HTML before replacing
+  if (!savedPricingHTML) {
+    savedPricingHTML = content.innerHTML;
+  }
   content.innerHTML = `
     <button id="pricing-close" class="pricing-close">✕</button>
     <h2 class="pricing-title">扫码支付</h2>
@@ -199,6 +204,27 @@ function initPricing() {
 }
 
 async function showPricingModal() {
+  // Restore original plan cards if they were replaced by payment step
+  const content = document.getElementById('pricing-content');
+  if (savedPricingHTML && !document.getElementById('plan-free')) {
+    content.innerHTML = savedPricingHTML;
+    savedPricingHTML = null;
+    // Re-bind pricing button events
+    document.getElementById('pricing-close').addEventListener('click', hidePricingModal);
+    document.getElementById('pricing-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) hidePricingModal();
+    });
+    document.querySelectorAll('#pricing-overlay .pricing-btn.primary').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plan = btn.dataset.plan;
+        if (!Auth.isLoggedIn()) {
+          showLoginModal();
+          return;
+        }
+        showPaymentStep(plan);
+      });
+    });
+  }
   let plan = 'free';
   try {
     const r = await Auth.getRemaining();
