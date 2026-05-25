@@ -29,7 +29,7 @@
   --scenario-color: #5b9bd5;
   --radius: 14px;
   --radius-sm: 10px;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  --font: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .light {
@@ -927,10 +927,10 @@ html, body {
   padding: 24px 32px;
 }
 .home-logo {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 900;
   color: var(--accent);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-shadow: 0 0 16px rgba(255, 214, 0, 0.5);
 }
 .home-login-btn {

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>灵析 Lynxi · 品牌升级预览</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #0d0d0d;
+  --surface: #1a1a1a;
+  --card-bg: rgba(255,214,0,0.02);
+  --border: #2a2a2a;
+  --accent: #FFD600;
+  --text: #e0e0e0;
+  --text-secondary: #888;
+  --text-muted: #555;
+  --font: 'Noto Sans SC', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.page { max-width: 960px; margin: 0 auto; padding: 64px 32px; }
+
+/* ===== Brand Section ===== */
+.brand-section {
+  text-align: center;
+  margin-bottom: 72px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logo-icon {
+  width: 48px; height: 48px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 32px rgba(255,214,0,0.5), 0 0 64px rgba(255,214,0,0.15);
+}
+.logo-icon::before {
+  content: ''; position: absolute; top: 12px; left: 12px;
+  width: 6px; height: 6px; border-radius: 50%; background: #1a1a1a;
+  box-shadow:
+    14px -4px 0 0 #1a1a1a,
+    -10px 8px 0 0 #1a1a1a,
+    2px 14px 0 0 #1a1a1a,
+    -14px -6px 0 0 #1a1a1a,
+    18px 10px 0 0 #1a1a1a;
+}
+.logo-icon::after {
+  content: ''; position: absolute;
+  inset: -4px; border-radius: 50%;
+  border: 1px solid rgba(255,214,0,0.3);
+  animation: pulse-ring 2.5s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.logo-text {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(255,214,0,0.4);
+}
+
+.logo-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.name-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 600px;
+  margin: 32px auto 0;
+}
+
+.name-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.name-card:hover, .name-card.pick {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(255,214,0,0.08);
+}
+.name-card.pick { background: rgba(255,214,0,0.05); }
+
+.name-cn { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+.name-card.pick .name-cn { color: var(--accent); }
+.name-en { font-size: 13px; color: var(--text-muted); }
+.name-desc { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+.name-rec {
+  position: absolute; top: -10px; right: -10px;
+  background: var(--accent); color: #1a1a1a;
+  font-size: 10px; font-weight: 700; padding: 2px 10px;
+  border-radius: 8px;
+}
+
+.name-card-inner { position: relative; }
+
+/* ===== Improvements Section ===== */
+.section-title {
+  font-size: 13px; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+.section-head { font-size: 26px; font-weight: 700; margin-bottom: 40px; }
+
+.improvement {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.improvement:last-child { border-bottom: none; }
+
+.improvement .meta .num {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.1em;
+}
+.improvement .meta h3 {
+  font-size: 20px; font-weight: 700; margin-bottom: 8px;
+}
+.improvement .meta .impact {
+  display: inline-block; font-size: 11px; padding: 2px 10px;
+  border-radius: 8px; background: rgba(255,214,0,0.1);
+  color: var(--accent);
+}
+
+.improvement .demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+}
+
+/* Demo: Brand logo */
+.demo-logo-big {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px;
+}
+.demo-logo-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 24px rgba(255,214,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  color: #1a1a1a; font-size: 14px; font-weight: 900;
+}
+.demo-logo-name {
+  font-size: 20px; font-weight: 900;
+  color: var(--accent);
+  text-shadow: 0 0 16px rgba(255,214,0,0.3);
+}
+
+/* Demo: Node hover with scale */
+.demo-nodes {
+  display: flex; gap: 24px; align-items: center;
+}
+.demo-node {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: pointer;
+}
+.demo-node:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(255,214,0,0.2);
+}
+.demo-node.selected {
+  border-color: var(--accent);
+  animation: selectPulse 0.6s ease-out;
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+@keyframes selectPulse {
+  0% { box-shadow: 0 0 0 rgba(255,214,0,0); }
+  50% { box-shadow: 0 0 24px rgba(255,214,0,0.5); }
+  100% { box-shadow: 0 0 4px rgba(255,214,0,0.1); }
+}
+
+/* Demo: Modal transition */
+.demo-modal-trigger {
+  padding: 8px 20px; border-radius: 16px;
+  border: 1px solid var(--accent); background: transparent;
+  color: var(--accent); cursor: pointer;
+  font-family: var(--font); font-size: 13px;
+  transition: all 0.15s;
+}
+.demo-modal-trigger:hover { background: rgba(255,214,0,0.1); }
+
+.demo-modal {
+  margin-top: 16px;
+  background: rgba(22,22,22,0.95); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 24px; max-width: 320px;
+  opacity: 0; transform: scale(0.95);
+  transition: opacity 0.2s ease-out, transform 0.25s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.demo-modal.open {
+  opacity: 1; transform: scale(1); pointer-events: auto;
+}
+
+/* Homepage comparison */
+.home-demo {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.home-mini {
+  background: #0d0d0d; border: 1px solid var(--border);
+  border-radius: 10px; padding: 24px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  font-size: 12px;
+}
+.home-mini.new { border-color: var(--accent); }
+
+/* ===== Actions ===== */
+.actions {
+  text-align: center; margin-top: 64px; padding-top: 48px;
+  border-top: 1px solid var(--border);
+}
+.actions p { color: var(--text-secondary); margin-bottom: 16px; font-size: 14px; }
+.actions button {
+  padding: 12px 32px; border-radius: 24px; border: none;
+  background: var(--accent); color: #1a1a1a;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+  font-family: var(--font);
+  box-shadow: 0 0 20px rgba(255,214,0,0.2);
+  transition: all 0.2s;
+}
+.actions button:hover { box-shadow: 0 0 32px rgba(255,214,0,0.4); transform: translateY(-1px); }
+
+@media (max-width: 700px) {
+  .improvement { grid-template-columns: 1fr; }
+  .home-demo, .name-options { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- BRANDING -->
+  <div class="brand-section">
+    <div class="logo">
+      <div class="logo-icon" style="display:flex;align-items:center;justify-content:center;color:#1a1a1a;font-weight:900;font-size:18px">灵</div>
+      <div>
+        <div class="logo-text">灵析</div>
+        <div class="logo-sub">Lynxi</div>
+      </div>
+    </div>
+
+    <p style="color:var(--text-secondary);font-size:14px;margin-top:16px">选择一个你喜欢的名字和图标</p>
+
+    <div class="name-options">
+      <div class="name-card pick" onclick="this.parentElement.querySelectorAll('.name-card').forEach(c=>c.classList.remove('pick'));this.classList.add('pick')">
+        <div class="name-card-inner">
+          <span class="name-rec">推荐</span>
+          <div class="name-cn">灵析</div>
+          <div class="name-en">Lynxi</div>
+          <div class="name-desc">灵感的分析 · 简洁有力 · 域名可用</div>
+        </div>
+      </div>
+      <div class="name-card" onclick="this.parentElement.querySelectorAll('.name-card').forEach(c=>c.classList.remove('pick'));this.classList.add('pick')">
+        <div class="name-card-inner">
+          <div class="name-cn">思涌</div>
+          <div class="name-en">Swell</div>
+          <div class="name-desc">思维涌动 · 短促有力 · 有画面感</div>
+        </div>
+      </div>
+      <div class="name-card" onclick="this.parentElement.querySelectorAll('.name-card').forEach(c=>c.classList.remove('pick'));this.classList.add('pick')">
+        <div class="name-card-inner">
+          <div class="name-cn">析光</div>
+          <div class="name-en">LitMind</div>
+          <div class="name-desc">分析之光 · 呼应黄色 · 现代感</div>
+        </div>
+      </div>
+      <div class="name-card" onclick="this.parentElement.querySelectorAll('.name-card').forEach(c=>c.classList.remove('pick'));this.classList.add('pick')">
+        <div class="name-card-inner">
+          <div class="name-cn">启点</div>
+          <div class="name-en">Spark</div>
+          <div class="name-desc">起点 / 点亮 · 根节点隐喻 · 国际化</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPROVEMENT 1: Brand Logo -->
+  <div class="improvement">
+    <div class="meta">
+      <div class="num">01</div>
+      <h3>品牌 Logo</h3>
+      <span class="impact">品牌识别</span>
+    </div>
+    <div class="demo">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">左上角替代 "Creative Muse"，有专属视觉符号</p>
+      <div class="demo-logo-big">
+        <div class="demo-logo-dot">灵</div>
+        <div class="demo-logo-name">灵析</div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px">黄圈光晕 + 暗纹发散线 + 字标。在任何页面上都能一眼认出品牌。</p>
+    </div>
+  </div>
+
+  <!-- IMPROVEMENT 2: Remove Inter -->
+  <div class="improvement">
+    <div class="meta">
+      <div class="num">02</div>
+      <h3>移除 Inter</h3>
+      <span class="impact">脱离 AI 感</span>
+    </div>
+    <div class="demo">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">
+        Inter → <span style="color:var(--accent)">Noto Sans SC</span>
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-family:Inter,sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">输入一个词</div>
+          <div style="font-family:Inter,sans-serif;font-size:12px;color:var(--text-muted)">Inter · AI 通用字体</div>
+        </div>
+        <div>
+          <div style="font-family:'Noto Sans SC',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">输入一个词</div>
+          <div style="font-size:12px;color:var(--accent)">Noto Sans SC · 中文更清晰</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:8px 12px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:11px;color:var(--text-muted)">
+        改一行 CSS：<code style="color:var(--accent)">--font: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPROVEMENT 3: Node hover + select animation -->
+  <div class="improvement">
+    <div class="meta">
+      <div class="num">03</div>
+      <h3>节点交互微动效</h3>
+      <span class="impact">品质感</span>
+    </div>
+    <div class="demo">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">hover 放大 + 选中脉冲光晕，精致不喧宾</p>
+      <div class="demo-nodes">
+        <div class="demo-node">正常</div>
+        <div class="demo-node" style="border-color:var(--accent);transform:scale(1.1);box-shadow:0 0 16px rgba(255,214,0,0.2)">悬停</div>
+        <div class="demo-node selected">选中</div>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:12px">悬停放大 1.1x + 金色描边 · 选中 0.6s 脉冲 + outline · 纯 CSS</p>
+    </div>
+  </div>
+
+  <!-- IMPROVEMENT 4: Homepage -->
+  <div class="improvement">
+    <div class="meta">
+      <div class="num">04</div>
+      <h3>首页差异化</h3>
+      <span class="impact">不等于 ChatGPT</span>
+    </div>
+    <div class="demo">
+      <div class="home-demo">
+        <div class="home-mini">
+          <div style="font-size:14px;font-weight:700">输入一个词</div>
+          <div style="width:100%;height:28px;border-radius:14px;border:1px solid var(--border);background:var(--surface)"></div>
+          <div style="padding:4px 16px;border-radius:14px;background:var(--accent);color:#1a1a1a;font-weight:700">发散</div>
+          <div style="color:var(--text-muted);font-size:11px;margin-top:4px">居中布局 · 像 ChatGPT</div>
+        </div>
+        <div class="home-mini new">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--accent)"></div>
+            <div style="font-size:12px;font-weight:700">灵析</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;text-align:left;width:100%">发掘<span style="color:var(--accent)">用户需求</span>的真实维度</div>
+          <div style="width:100%;height:32px;border-radius:8px;border:1px solid var(--accent);background:var(--surface)"></div>
+          <div style="display:flex;gap:6px;width:100%">
+            <div style="padding:2px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;color:var(--text-secondary)">痛点分析</div>
+            <div style="padding:2px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;color:var(--text-secondary)">场景挖掘</div>
+            <div style="padding:2px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;color:var(--text-secondary)">需求拆解</div>
+          </div>
+          <div style="color:var(--accent);font-size:11px;margin-top:4px">非对称布局 · 有品牌感</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPROVEMENT 5: Card tone -->
+  <div class="improvement">
+    <div class="meta">
+      <div class="num">05</div>
+      <h3>卡片微暖底色</h3>
+      <span class="impact">层次深度</span>
+    </div>
+    <div class="demo">
+      <div style="display:flex;gap:16px">
+        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:12px;color:var(--text-secondary)">
+          当前：纯灰黑色<br>和背景同色温
+        </div>
+        <div style="flex:1;background:rgba(26,26,26,0.9);border:1px solid rgba(255,214,0,0.12);border-radius:10px;padding:16px;font-size:12px;color:var(--text-secondary)">
+          改进：极淡暖色<br>微妙的层次差异
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:12px">三行 CSS：给 card 加 <code style="color:var(--accent)">background: rgba(26,26,26,0.92)</code> + <code style="color:var(--accent)">border-color: rgba(255,214,0,0.08)</code></p>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="improvement" style="border-bottom:none;padding-bottom:0">
+    <div class="meta">
+      <div class="num">06</div>
+      <h3>整体工作量</h3>
+      <span class="impact">汇总</span>
+    </div>
+    <div class="demo">
+      <table style="width:100%;font-size:13px;color:var(--text-secondary);border-collapse:collapse">
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 0">01 品牌 Logo</td>
+          <td style="padding:8px 0;color:var(--accent)">15 行 HTML + 20 行 CSS</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 0">02 移除 Inter 字体</td>
+          <td style="padding:8px 0;color:var(--accent)">改 1 行 CSS</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 0">03 节点微动效</td>
+          <td style="padding:8px 0;color:var(--accent)">20 行 CSS</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 0">04 首页差异化</td>
+          <td style="padding:8px 0;color:var(--accent)">40 行 HTML/CSS</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 0">05 卡片暖色</td>
+          <td style="padding:8px 0;color:var(--accent)">3 行 CSS</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;font-weight:700;color:var(--text)">合计</td>
+          <td style="padding:8px 0;font-weight:700;color:var(--accent)">~100 行 · 30 分钟</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="actions">
+    <p>选择你喜欢的名字，确认改进内容，我就开始落地。</p>
+  </div>
+
+</div>
+<script>
+// Re-trigger select pulse animation
+setInterval(() => {
+  const sel = document.querySelector('.demo-node.selected');
+  if (sel) { sel.style.animation = 'none'; sel.offsetHeight; sel.style.animation = 'selectPulse 0.6s ease-out'; }
+}, 3000);
+
+// Modal toggle
+document.getElementById('modal-toggle').addEventListener('click', function() {
+  document.getElementById('modal-demo').classList.toggle('open');
+});
+</script>
+</body>
+</html>
