@@ -390,6 +390,7 @@ export function bindEvents() {
     if (isUIClick(e.target)) return;
     if (e.target.closest('.graph-node')) return;
     if (S.activePopup) { if (!e.target.closest('.popup-menu')) hidePopupMenu(); }
+    if (S.detailPopup && !e.target.closest('.detail-popup')) hideDetailPopup();
     if (S.selectedNodeId) {
       const prev = S.nodesLayer.querySelector(`.graph-node[data-node-id="${S.selectedNodeId}"]`);
       if (prev) prev.classList.remove('selected');
