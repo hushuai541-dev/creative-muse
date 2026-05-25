@@ -51,6 +51,28 @@ export function startPhysicsLoop() {
       if (Math.abs(node.vx) > 0.01 || Math.abs(node.vy) > 0.01) needsUpdate = true;
     }
 
+    // Global collision: check all visible non-root nodes against each other
+    const nodeIds = Object.keys(S.state.nodes);
+    for (let a = 0; a < nodeIds.length; a++) {
+      const node = S.state.nodes[nodeIds[a]];
+      if (!node.parentId) continue;
+      for (let b = a + 1; b < nodeIds.length; b++) {
+        const other = S.state.nodes[nodeIds[b]];
+        if (!other.parentId) continue;
+        if (node.parentId === other.parentId) continue; // siblings handled below
+        const dx = node.x - other.x, dy = node.y - other.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < S.COLLISION_RADIUS * 1.6 && dist > 0.001) {
+          const force = (S.COLLISION_RADIUS * 1.6 - dist) * S.COLLISION_FORCE * 0.01;
+          const fx = dx / dist * force, fy = dy / dist * force;
+          if (!S.dragging || S.dragging.nodeId !== node.id) { node.x += fx; node.y += fy; }
+          if (!S.dragging || S.dragging.nodeId !== other.id) { other.x -= fx; other.y -= fy; }
+          needsUpdate = true;
+        }
+      }
+    }
+
+    // Sibling collision (stronger push)
     for (const id in S.state.nodes) {
       const node = S.state.nodes[id];
       if (!node.parentId) continue;
