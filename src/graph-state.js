@@ -3,8 +3,8 @@
 
 export const STORAGE_KEY = 'creative-muse-graph';
 
-export const ROOT_RADIUS = 160;
-export const CHILD_RADIUS = 150;
+export const ROOT_RADIUS = 180;
+export const CHILD_RADIUS = 170;
 
 export const SPRING_STIFFNESS = 0.08;
 export const SPRING_DAMPING = 0.75;
