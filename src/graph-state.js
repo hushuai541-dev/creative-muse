@@ -3,8 +3,8 @@
 
 export const STORAGE_KEY = 'creative-muse-graph';
 
-export const ROOT_RADIUS = 180;
-export const CHILD_RADIUS = 170;
+export const ROOT_RADIUS = 140;
+export const CHILD_RADIUS = 120;
 
 export const SPRING_STIFFNESS = 0.08;
 export const SPRING_DAMPING = 0.75;
@@ -141,7 +141,22 @@ export function layoutChildren(parentId) {
   if (count === 0) return;
   const radius = parent.parentId === null ? ROOT_RADIUS : CHILD_RADIUS;
   const angleStep = (2 * Math.PI) / count;
-  const startAngle = (parent.x * 0.1 + parent.y * 0.1) % (2 * Math.PI);
+
+  // For non-root nodes, place children away from the grandparent to avoid overlap
+  let startAngle;
+  if (parent.parentId) {
+    const gp = getNode(parent.parentId);
+    if (gp) {
+      const dx = parent.x - gp.x;
+      const dy = parent.y - gp.y;
+      startAngle = Math.atan2(dy, dx); // direction away from grandparent
+    } else {
+      startAngle = (parent.x * 0.1 + parent.y * 0.1) % (2 * Math.PI);
+    }
+  } else {
+    startAngle = (parent.x * 0.1 + parent.y * 0.1) % (2 * Math.PI);
+  }
+
   children.forEach((child, i) => {
     const angle = startAngle + i * angleStep;
     child.targetX = parent.x + Math.cos(angle) * radius;
