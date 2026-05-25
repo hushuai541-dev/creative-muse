@@ -158,7 +158,7 @@ function showPaymentStep(plan) {
     <ol style="font-size:13px;color:var(--text-secondary);line-height:2;padding-left:20px;margin-bottom:20px">
       <li>微信扫描上方二维码付款</li>
       <li>付款后点击下方按钮</li>
-      <li>管理员确认后自动开通</li>
+      <li>支付后自动开通</li>
     </ol>
     <button id="pay-confirm" class="pricing-btn primary" style="width:100%">我已支付，开通${name}</button>
     <button id="pay-back" style="width:100%;padding:8px;margin-top:8px;border-radius:10px;border:1px solid var(--surface-border);background:transparent;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:var(--font)">← 返回选择套餐</button>
