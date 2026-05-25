@@ -154,9 +154,7 @@ function showPaymentStep(plan) {
       <div style="font-size:32px;font-weight:900;color:var(--accent);margin-bottom:4px">¥${price}</div>
       <div style="font-size:14px;color:var(--text-secondary)">${name}</div>
     </div>
-    <div style="width:200px;height:200px;margin:0 auto 20px;border:2px dashed var(--surface-border);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;text-align:center;background:var(--surface-bg)">
-      <span>此处放你的<br>微信收款码图片</span>
-    </div>
+    <img src="/qr-code.png" alt="微信收款码" style="width:200px;height:200px;margin:0 auto 20px;display:block;border-radius:16px;border:2px solid var(--accent)" />
     <ol style="font-size:13px;color:var(--text-secondary);line-height:2;padding-left:20px;margin-bottom:20px">
       <li>微信扫描上方二维码付款</li>
       <li>付款后点击下方按钮</li>
