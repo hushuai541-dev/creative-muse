@@ -176,3 +176,4 @@ export function getRemainingUsage(userId) {
     permanentTokens: user.permanentTokens,
     plan: user.plan,
   };
+}
